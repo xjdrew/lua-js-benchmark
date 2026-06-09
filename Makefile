@@ -1,0 +1,91 @@
+SHELL := /bin/bash
+ROOT_DIR := $(shell pwd)
+SCRIPTS_DIR := $(ROOT_DIR)/scripts
+BUILD_DIR := $(ROOT_DIR)/.build
+ENGINES_DIR := $(BUILD_DIR)/engines
+SRC_DIR := $(BUILD_DIR)/src
+
+ENGINES ?= lua luajit quickjs v8
+CATEGORY ?=
+RUNS ?= 5
+WARMUP ?= 2
+
+export ROOT_DIR SCRIPTS_DIR BUILD_DIR ENGINES_DIR SRC_DIR ENGINES CATEGORY RUNS WARMUP
+
+.PHONY: all setup bench report clean rebuild help \
+        download download-lua download-luajit download-quickjs download-v8 \
+        build-lua build-luajit build-quickjs build-v8
+
+all: setup bench report
+
+setup:
+	@bash $(SCRIPTS_DIR)/setup.sh
+
+bench:
+	@bash $(ROOT_DIR)/runner/run.sh
+
+report:
+	@python3 $(ROOT_DIR)/report/generate.py
+
+# --- Download targets (individual retry) ---
+
+download:
+	@bash $(SCRIPTS_DIR)/download_sources.sh
+
+download-lua:
+	@ENGINES=lua bash $(SCRIPTS_DIR)/download_sources.sh
+
+download-luajit:
+	@ENGINES=luajit bash $(SCRIPTS_DIR)/download_sources.sh
+
+download-quickjs:
+	@ENGINES=quickjs bash $(SCRIPTS_DIR)/download_sources.sh
+
+download-v8:
+	@ENGINES=v8 bash $(SCRIPTS_DIR)/download_sources.sh
+
+# --- Build targets (individual retry) ---
+
+build-lua:
+	@bash $(SCRIPTS_DIR)/build_lua.sh
+
+build-luajit:
+	@bash $(SCRIPTS_DIR)/build_luajit.sh
+
+build-quickjs:
+	@bash $(SCRIPTS_DIR)/build_quickjs.sh
+
+build-v8:
+	@bash $(SCRIPTS_DIR)/build_v8.sh
+
+# --- Clean ---
+
+clean:
+	@echo "Removing .build/ and results/ ..."
+	@rm -rf $(BUILD_DIR) results/
+
+rebuild: clean setup
+
+help:
+	@echo "lua-js-benchmark - Lua / JavaScript engine performance comparison"
+	@echo ""
+	@echo "Usage:"
+	@echo "  make setup                       Initialize: check deps, download sources, build engines"
+	@echo "  make bench                       Run all benchmarks"
+	@echo "  make report                      Generate comparison report"
+	@echo "  make all                         setup + bench + report"
+	@echo ""
+	@echo "  make setup ENGINES=\"lua luajit\"   Only setup specified engines"
+	@echo "  make bench CATEGORY=compute      Only run specific category"
+	@echo "  make bench ENGINES=\"lua luajit\"   Only benchmark specified engines"
+	@echo "  make bench RUNS=10 WARMUP=3      Adjust iterations"
+	@echo ""
+	@echo "  make download-lua                Download Lua source only"
+	@echo "  make download-v8                 Download V8 source only"
+	@echo "  make build-lua                   Build Lua only"
+	@echo "  make build-v8                    Build V8 only"
+	@echo ""
+	@echo "  make clean                       Remove .build/ and results/"
+	@echo "  make rebuild                     Clean + setup"
+	@echo ""
+	@echo "Supported ENGINES: lua luajit quickjs v8"
