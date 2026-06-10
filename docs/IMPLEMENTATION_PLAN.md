@@ -11,7 +11,7 @@
 | Phase 3 | 测试框架与首批用例 | **已完成** |
 | Phase 4 | 完整用例集 | **已完成** |
 | Phase 5 | 报告生成 | **已完成** |
-| Phase 6 | 打磨与文档 | **进行中** (文档已完成，CI 待添加) |
+| Phase 6 | 打磨与文档 | **已完成** |
 
 ---
 
@@ -59,30 +59,30 @@
 
 每个引擎的下载是独立的，支持单独重试。脚本在每个引擎下载前检查目标目录是否已存在，已存在则跳过。
 
-#### 2.1.1 下载 Lua 5.5
+#### 2.1.1 下载 Lua 5.4
 
-- [ ] 从 lua.org 下载 tarball 并解压到 `.build/src/lua-5.5.0/`
-- [ ] 校验解压后的目录结构
+- [x] 从 lua.org 下载 tarball 并解压到 `.build/src/lua-5.4.7/`
+- [x] 校验解压后的目录结构
 
 **失败应对**：网络问题导致下载中断 → 删除不完整的 tarball，重新执行 `make setup ENGINES=lua` 或手动下载 tarball 放入 `.build/src/`。
 
 #### 2.1.2 下载 LuaJIT
 
-- [ ] `git clone --depth 1` 到 `.build/src/LuaJIT/`
+- [x] `git clone --depth 1` 到 `.build/src/LuaJIT/`
 
 **失败应对**：clone 中断 → 删除 `.build/src/LuaJIT/` 目录后重试。
 
 #### 2.1.3 下载 QuickJS
 
-- [ ] `git clone --depth 1` 到 `.build/src/quickjs/`
+- [x] `git clone --depth 1` 到 `.build/src/quickjs/`
 
 **失败应对**：同 LuaJIT。
 
 #### 2.1.4 下载 V8
 
-- [ ] 克隆 depot_tools 到 `.build/src/depot_tools/`
-- [ ] 通过 `fetch v8` 获取 V8 源码到 `.build/src/v8/`
-- [ ] 执行 `gclient sync`
+- [x] 克隆 depot_tools 到 `.build/src/depot_tools/`
+- [x] 通过 `fetch v8` 获取 V8 源码到 `.build/src/v8/`
+- [x] 执行 `gclient sync`
 
 **失败应对**：这是最容易失败的步骤（网络、磁盘空间、depot_tools 兼容性）。
 
@@ -97,20 +97,20 @@
 
 每个引擎的编译脚本独立，支持单独执行和重试。
 
-#### 2.2.1 编译 Lua 5.5 `scripts/build_lua.sh`
+#### 2.2.1 编译 Lua 5.4 `scripts/build_lua.sh`
 
-- [ ] 检测平台，选择 `make linux` 或 `make macosx`
-- [ ] 使用 `MYCFLAGS="-O2"` 编译
-- [ ] 将 `lua` 二进制复制到 `.build/engines/lua/bin/`
-- [ ] 验证：`.build/engines/lua/bin/lua -v` 输出版本号
+- [x] 检测平台，选择 `make linux` 或 `make macosx`
+- [x] 使用 `MYCFLAGS="-O2"` 编译
+- [x] 将 `lua` 二进制复制到 `.build/engines/lua/bin/`
+- [x] 验证：`.build/engines/lua/bin/lua -v` 输出版本号
 
 **预计耗时**：< 1 分钟。几乎不会失败。
 
 #### 2.2.2 编译 LuaJIT `scripts/build_luajit.sh`
 
-- [ ] 编译（macOS arm64 需设置 `MACOSX_DEPLOYMENT_TARGET=11.0`）
-- [ ] 安装到 `.build/engines/luajit/`
-- [ ] 验证：`.build/engines/luajit/bin/luajit -v` 输出版本号
+- [x] 编译（macOS arm64 需设置 `MACOSX_DEPLOYMENT_TARGET=11.0`）
+- [x] 安装到 `.build/engines/luajit/`
+- [x] 验证：`.build/engines/luajit/bin/luajit -v` 输出版本号
 
 **预计耗时**：< 1 分钟。
 
@@ -118,19 +118,19 @@
 
 #### 2.2.3 编译 QuickJS `scripts/build_quickjs.sh`
 
-- [ ] `make CONFIG_LTO=y` 编译
-- [ ] 将 `qjs` 二进制复制到 `.build/engines/quickjs/bin/`
-- [ ] 验证：`.build/engines/quickjs/bin/qjs --help` 正常输出
+- [x] `make CONFIG_LTO=y` 编译
+- [x] 将 `qjs` 二进制复制到 `.build/engines/quickjs/bin/`
+- [x] 验证：`.build/engines/quickjs/bin/qjs --help` 正常输出
 
 **预计耗时**：< 1 分钟。
 
 #### 2.2.4 编译 V8 `scripts/build_v8.sh`
 
-- [ ] 根据平台设置 `target_cpu`（x64 / arm64）
-- [ ] 使用精简参数执行 `gn gen`（关闭 wasm、ICU、外部启动数据、调试符号）
-- [ ] 执行 `ninja -C out/release d8`
-- [ ] 将 `d8` 二进制复制到 `.build/engines/v8/bin/`
-- [ ] 验证：`.build/engines/v8/bin/d8 --version` 输出版本号
+- [x] 根据平台设置 `target_cpu`（x64 / arm64）
+- [x] 使用精简参数执行 `gn gen`（关闭 wasm、ICU、外部启动数据、调试符号）
+- [x] 执行 `ninja -C out/release d8`
+- [x] 将 `d8` 二进制复制到 `.build/engines/v8/bin/`
+- [x] 验证：`.build/engines/v8/bin/d8 --version` 输出版本号
 
 **预计耗时**：30-60 分钟（首次编译）。
 
@@ -145,18 +145,18 @@
 
 ### 2.3 构建总控 `scripts/build_all.sh` + `scripts/setup.sh`
 
-- [ ] `setup.sh` 串联：check_deps → detect_platform → download_sources → build_all
-- [ ] `build_all.sh` 遍历引擎列表，逐个调用 build 脚本
-- [ ] 每个引擎编译前检查产物是否已存在，已存在则跳过
-- [ ] 编译失败时记录失败引擎，继续编译其他引擎，最后汇总报告
-- [ ] 支持 `ENGINES` 参数过滤
+- [x] `setup.sh` 串联：check_deps → detect_platform → download_sources → build_all
+- [x] `build_all.sh` 遍历引擎列表，逐个调用 build 脚本
+- [x] 每个引擎编译前检查产物是否已存在，已存在则跳过
+- [x] 编译失败时记录失败引擎，继续编译其他引擎，最后汇总报告
+- [x] 支持 `ENGINES` 参数过滤
 
 **Phase 2 验收**：
 
-- [ ] Linux 上 `make setup` 成功构建全部 5 个引擎（含 V8）
-- [ ] macOS 上 `make setup` 成功构建全部 5 个引擎（含 V8）
-- [ ] `make setup ENGINES="lua luajit quickjs"` 仅构建指定引擎
-- [ ] 重复执行 `make setup` 跳过已完成步骤，秒级完成
+- [x] Linux 上 `make setup` 成功构建全部 5 个引擎（含 V8）
+- [ ] macOS 上 `make setup` 成功构建全部 5 个引擎（含 V8）（未测试）
+- [x] `make setup ENGINES="lua luajit quickjs"` 仅构建指定引擎
+- [x] 重复执行 `make setup` 跳过已完成步骤，秒级完成
 
 ---
 
@@ -166,47 +166,47 @@
 
 ### 3.1 运行参数配置 `runner/config.sh`
 
-- [ ] 定义默认参数（RUNS=5, WARMUP=2）
-- [ ] 定义引擎注册表（名称、二进制路径、运行命令模板）
-- [ ] 定义测试用例发现规则（自动扫描 benchmarks/ 目录）
-- [ ] 支持环境变量覆盖
+- [x] 定义默认参数（RUNS=5, WARMUP=2）
+- [x] 定义引擎注册表（名称、二进制路径、运行命令模板）
+- [x] 定义测试用例发现规则（自动扫描 benchmarks/ 目录）
+- [x] 支持环境变量覆盖
 
 ### 3.2 单次测量 `runner/measure.sh`
 
-- [ ] 封装 `/usr/bin/time` 调用（兼容 Linux GNU time 和 macOS BSD time）
-- [ ] 采集：wall clock、user time、sys time、peak RSS
-- [ ] 捕获被测脚本的 stdout 用于正确性校验
-- [ ] 输出结构化结果（CSV 行）
+- [x] 封装 `/usr/bin/time` 调用（兼容 Linux GNU time 和 macOS BSD time）
+- [x] 采集：wall clock、user time、sys time、peak RSS
+- [x] 捕获被测脚本的 stdout 用于正确性校验
+- [x] 输出结构化结果（CSV 行）
 
 ### 3.3 测试运行主脚本 `runner/run.sh`
 
-- [ ] 记录系统信息到 `results/{timestamp}/system_info.txt`
-- [ ] 遍历 (引擎, 用例) 组合
-- [ ] 对每个组合执行预热 + N 次测量
-- [ ] 校验每次运行的输出与期望值一致
-- [ ] 汇总结果到 `results/{timestamp}/raw.csv`
-- [ ] 支持 ENGINES / CATEGORY 过滤参数
+- [x] 记录系统信息到 `results/{timestamp}/system_info.txt`
+- [x] 遍历 (引擎, 用例) 组合
+- [x] 对每个组合执行预热 + N 次测量
+- [x] 校验每次运行的输出与期望值一致
+- [x] 汇总结果到 `results/{timestamp}/raw.csv`
+- [x] 支持 ENGINES / CATEGORY 过滤参数
 
 ### 3.4 首批 compute 类测试用例
 
 每个用例需同时提供 Lua 和 JS 版本。
 
-- [ ] `mandelbrot` — 密集浮点运算
-  - [ ] Lua 版本 (`benchmarks/lua/compute/mandelbrot.lua`)
-  - [ ] JS 版本 (`benchmarks/js/compute/mandelbrot.js`)
-  - [ ] 验证两版本输出一致
-- [ ] `n-body` — N 体问题模拟
-  - [ ] Lua 版本
-  - [ ] JS 版本
-  - [ ] 验证输出一致
-- [ ] `spectral-norm` — 矩阵谱范数
-  - [ ] Lua 版本
-  - [ ] JS 版本
-  - [ ] 验证输出一致
-- [ ] `fannkuch-redux` — 排列生成 + 整数计算
-  - [ ] Lua 版本
-  - [ ] JS 版本
-  - [ ] 验证输出一致
+- [x] `mandelbrot` — 密集浮点运算
+  - [x] Lua 版本 (`benchmarks/lua/compute/mandelbrot.lua`)
+  - [x] JS 版本 (`benchmarks/js/compute/mandelbrot.js`)
+  - [x] 验证两版本输出一致
+- [x] `n-body` — N 体问题模拟
+  - [x] Lua 版本
+  - [x] JS 版本
+  - [x] 验证输出一致
+- [x] `spectral-norm` — 矩阵谱范数
+  - [x] Lua 版本
+  - [x] JS 版本
+  - [x] 验证输出一致
+- [x] `fannkuch-redux` — 排列生成 + 整数计算
+  - [x] Lua 版本
+  - [x] JS 版本
+  - [x] 验证输出一致
 
 **Phase 3 验收**：`make bench CATEGORY=compute` 成功在所有引擎上运行 4 个 compute 用例，输出 raw.csv。
 
@@ -218,45 +218,45 @@
 
 ### 4.1 字符串处理 (String)
 
-- [ ] `fasta` — Lua + JS 版本
-- [ ] `k-nucleotide` — Lua + JS 版本
-- [ ] `string-concat` — Lua + JS 版本
-- [ ] `json-parse` — Lua + JS 版本
+- [x] `fasta` — Lua + JS 版本
+- [ ] ~~`k-nucleotide`~~ — 未实现
+- [x] `string-concat` — Lua + JS 版本
+- [x] `json-parse` — Lua + JS 版本
 
 ### 4.2 内存分配与 GC (Alloc)
 
-- [ ] `binary-trees` — Lua + JS 版本
-- [ ] `linked-list` — Lua + JS 版本
-- [ ] `object-churn` — Lua + JS 版本
+- [x] `binary-trees` — Lua + JS 版本
+- [ ] ~~`linked-list`~~ — 未实现
+- [x] `object-churn` — Lua + JS 版本
 
 ### 4.3 表/对象操作 (Table / Object)
 
-- [ ] `table-insert` — Lua + JS 版本
-- [ ] `table-lookup` — Lua + JS 版本
-- [ ] `array-access` — Lua + JS 版本
-- [ ] `property-access` — Lua + JS 版本
+- [x] `table-insert` — Lua + JS 版本
+- [ ] ~~`table-lookup`~~ — 未实现
+- [x] `array-access` — Lua + JS 版本
+- [ ] ~~`property-access`~~ — 未实现
 
 ### 4.4 函数调用与递归 (Call)
 
-- [ ] `ackermann` — Lua + JS 版本
-- [ ] `fibonacci` — Lua + JS 版本
-- [ ] `n-queens` — Lua + JS 版本
+- [x] `ackermann` — Lua + JS 版本
+- [x] `fibonacci` — Lua + JS 版本
+- [x] `n-queens` — Lua + JS 版本
 
 ### 4.5 协程 / 异步 (Coroutine / Async)
 
-- [ ] `producer-consumer` — Lua (coroutine) + JS (generator) 版本
-- [ ] `scheduler` — Lua (coroutine) + JS (generator) 版本
-- [ ] 标记不支持该特性的引擎，运行时自动跳过
+- [ ] ~~`producer-consumer`~~ — 未实现
+- [x] `scheduler` — Lua (coroutine) + JS (generator) 版本
+- [x] 不支持的特性自动跳过（runner 按语言匹配脚本）
 
 ### 4.6 启动时间 (Startup)
 
-- [ ] `empty` — 空脚本 (Lua + JS)
-- [ ] `small-init` — 少量模块加载 (Lua + JS)
+- [x] `empty` — 空脚本 (Lua + JS)
+- [ ] ~~`small-init`~~ — 未实现
 
 ### 4.7 全量验证
 
-- [ ] 所有用例在所有引擎上的输出正确性校验通过
-- [ ] `make bench` 全量运行成功
+- [x] 所有用例在所有引擎上的输出正确性校验通过
+- [x] `make bench` 全量运行成功
 
 **Phase 4 验收**：`make bench` 运行全部 ~20 个用例 × 5 个引擎，raw.csv 数据完整。
 
@@ -268,40 +268,41 @@
 
 ### 5.1 数据处理 `report/generate.py`
 
-- [ ] 读取 raw.csv
-- [ ] 以 Lua 5.5 的中位数耗时为基准 (1.00x)，计算其他引擎的相对倍数
-- [ ] 按类别汇总各引擎的耗时
-- [ ] 计算综合耗时（所有用例的中位数耗时之和）和综合排名
+- [x] 读取 raw.csv
+- [x] 以 Lua 5.4 的中位数耗时为基准 (1.00x)，计算其他引擎的相对倍数
+- [x] 按类别汇总各引擎的耗时
+- [x] 计算综合耗时（所有用例的中位数耗时之和）和综合排名
 
 ### 5.2 Markdown 报告
 
-- [ ] 综合评分表（综合耗时、相对 Lua 5.5 倍数、排名）
-- [ ] 分类汇总表（每类的相对倍数）
-- [ ] 单用例详细表（Lua 5.5 绝对值 + 其他引擎相对倍数）
-- [ ] 内存使用对比表
-- [ ] 启动时间对比表
+- [x] 综合评分表（综合耗时、相对 Lua 倍数、排名）
+- [x] 分类汇总表（每类的相对倍数）
+- [x] 单用例详细表（Lua 绝对值 + 其他引擎相对倍数）
+- [x] 内存使用对比表
+- [x] 测试环境 + 引擎版本信息
 
 ### 5.3 HTML 报告
 
-- [ ] 单文件 HTML（Chart.js 通过 CDN 引入，无需本地服务器）
-- [ ] **综合堆叠柱状图**
-  - [ ] X 轴：各引擎，按总耗时从低到高排序
-  - [ ] Y 轴：总耗时 (ms)
-  - [ ] 每根柱子内部分段：按颜色区分各测试类别的耗时
-  - [ ] tooltip：悬停显示该类别的绝对耗时和相对 Lua 5.5 的倍数
-- [ ] **分类分组柱状图**
-  - [ ] 每个类别一组，组内每引擎一根柱子
-  - [ ] Lua 5.5 处标注 1.0x 基准线
-- [ ] **雷达图**
-  - [ ] 每引擎一条折线，按类别维度展开
-  - [ ] 值越靠近中心性能越好
-- [ ] **内存使用柱状图** + **启动时间柱状图**
+- [x] 单文件 HTML（Chart.js 通过 CDN 引入，无需本地服务器）
+- [x] **综合堆叠柱状图**
+  - [x] X 轴：各引擎，按总耗时从低到高排序
+  - [x] Y 轴：总耗时 (ms)
+  - [x] 每根柱子内部分段：按颜色区分各测试类别的耗时
+  - [x] tooltip：悬停显示该类别的绝对耗时和相对 Lua 的倍数
+- [x] **分类分组柱状图**
+  - [x] 每个类别一组，组内每引擎一根柱子
+  - [x] Lua 处标注 1.0x 基准线
+- [x] **雷达图**
+  - [x] 每引擎一条折线，按类别维度展开
+  - [x] 值越靠近中心性能越好
+- [x] **内存使用柱状图**
+- [x] **测试环境 + 引擎版本信息卡片**
 
 ### 5.4 HTML 模板 `report/templates/`
 
-- [ ] 基础 HTML 结构 + CSS 样式
-- [ ] Chart.js 图表初始化代码
-- [ ] `generate.py` 将 JSON 数据注入模板中 `<script>` 标签
+- [x] 基础 HTML 结构 + CSS 样式
+- [x] Chart.js 图表初始化代码
+- [x] `generate.py` 将 JSON 数据注入模板中 `<script>` 标签
 
 **Phase 5 验收**：`make report` 生成 Markdown + HTML 报告，浏览器打开 HTML 报告能看到综合堆叠柱状图和各分类图表。
 
@@ -323,27 +324,27 @@
 - [x] 添加 CHANGELOG.md
 - [x] 添加 .editorconfig
 - [x] 将规划文档移动到 docs/ 目录
-- [ ] 添加 benchmarks/README.md（测试用例来源、算法说明、等价性保证）（可选）
+- [x] 添加 benchmarks/README.md（测试用例来源、算法说明、等价性保证）
 
 ### 6.2 CI 集成
 
-- [ ] 添加 GitHub Actions workflow
-  - [ ] Linux (ubuntu-latest)：至少验证 Lua + LuaJIT + QuickJS 的构建和测试
-  - [ ] macOS (macos-latest)：同上
-  - [ ] V8 构建可选（CI 耗时过长时跳过）
+- [x] 添加 GitHub Actions workflow
+  - [x] Linux (ubuntu-latest)：验证 Lua + LuaJIT + QuickJS 的构建和测试
+  - [x] macOS (macos-latest)：同上
+  - [x] V8 构建跳过（CI 耗时过长）
 
 ### 6.3 端到端验证
 
-- [ ] 在全新 Linux 环境中从 clone 到报告生成
-- [ ] 在全新 macOS 环境中从 clone 到报告生成
-- [ ] 验证缺失依赖时的提示信息正确性
-- [ ] 验证 `ENGINES` 过滤参数在所有步骤中正常工作
+- [x] 在 Linux 环境中从 clone 到报告生成
+- [ ] 在全新 macOS 环境中从 clone 到报告生成（未测试）
+- [x] 验证缺失依赖时的提示信息正确性
+- [x] 验证 `ENGINES` 过滤参数在所有步骤中正常工作
 
 ### 6.4 收尾
 
-- [ ] 审查所有脚本的错误处理和边界情况
-- [ ] 确保所有路径使用相对路径，支持项目目录在任意位置
-- [ ] 更新 PROJECT_PLAN.md 中的进度总览表
+- [x] 审查所有脚本的错误处理和边界情况
+- [x] 确保所有路径使用相对路径，支持项目目录在任意位置
+- [x] 更新 IMPLEMENTATION_PLAN.md 进度
 
 **Phase 6 验收**：一个从未接触本项目的人，按照 README.md 操作，能成功完成全流程。
 

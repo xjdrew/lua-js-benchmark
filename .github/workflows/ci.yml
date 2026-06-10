@@ -1,0 +1,72 @@
+name: CI
+
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+    branches: [master, main]
+
+jobs:
+  build-and-test:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential git curl python3 time
+
+      - name: Install dependencies (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          brew install python3
+
+      - name: Setup engines
+        run: make setup ENGINES="lua luajit quickjs"
+
+      - name: Verify engine binaries
+        run: |
+          .build/engines/lua/bin/lua -v
+          .build/engines/luajit/bin/luajit -v
+          .build/engines/quickjs/bin/qjs --help 2>&1 | head -1
+
+      - name: Run benchmarks
+        run: make bench ENGINES="lua luajit quickjs" RUNS=2 WARMUP=1
+
+      - name: Verify output correctness
+        run: |
+          RESULTS_DIR=$(ls -td results/*/ | head -1)
+          echo "Results in: $RESULTS_DIR"
+          test -f "${RESULTS_DIR}raw.csv"
+          test -f "${RESULTS_DIR}system_info.json"
+          LINE_COUNT=$(wc -l < "${RESULTS_DIR}raw.csv")
+          echo "CSV lines: $LINE_COUNT"
+          test "$LINE_COUNT" -gt 1
+
+      - name: Generate report
+        run: make report
+
+      - name: Verify reports
+        run: |
+          RESULTS_DIR=$(ls -td results/*/ | head -1)
+          test -f "${RESULTS_DIR}report.md"
+          test -f "${RESULTS_DIR}report.html"
+          grep -q "Test Environment" "${RESULTS_DIR}report.md"
+          grep -q "Engines" "${RESULTS_DIR}report.md"
+          echo "Reports generated successfully"
+
+      - name: Upload results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: results-${{ matrix.os }}
+          path: results/
+          retention-days: 7
