@@ -34,6 +34,26 @@ ENGINE_ARGS[quickjs]="--stack-size 33554432"
 ENGINE_ARGS[v8]=""
 ENGINE_ARGS[v8-nojit]="--jitless"
 
+declare -A ENGINE_DISPLAY_NAME
+ENGINE_DISPLAY_NAME[lua]="Lua 5.4"
+ENGINE_DISPLAY_NAME[luajit]="LuaJIT 2.1"
+ENGINE_DISPLAY_NAME[quickjs]="QuickJS"
+ENGINE_DISPLAY_NAME[v8]="V8 (JIT)"
+ENGINE_DISPLAY_NAME[v8-nojit]="V8 (no-JIT)"
+
+get_engine_version() {
+    local engine="$1"
+    local bin="${ENGINE_BIN[$engine]}"
+    [[ -x "$bin" ]] || { echo "unknown"; return; }
+    case "$engine" in
+        lua)         "$bin" -v 2>&1 | head -1 || true ;;
+        luajit)      "$bin" -v 2>&1 | head -1 || true ;;
+        quickjs)     "$bin" --help 2>&1 | head -1 || true ;;
+        v8|v8-nojit) "$bin" --version 2>&1 | head -1 || true ;;
+        *)           echo "unknown" ;;
+    esac
+}
+
 declare -A CATEGORY_DIR_JS
 CATEGORY_DIR_JS[compute]="compute"
 CATEGORY_DIR_JS[string]="string"

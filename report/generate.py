@@ -15,6 +15,14 @@ REPORT_TEMPLATE = Path(__file__).parent / "templates" / "report.html"
 BASELINE_ENGINE = "lua"
 
 
+def load_system_info(results_dir):
+    json_file = results_dir / "system_info.json"
+    if json_file.exists():
+        with open(json_file) as f:
+            return json.load(f)
+    return {}
+
+
 def find_latest_results():
     if not RESULTS_DIR.exists():
         print("[ERROR] No results directory found. Run 'make bench' first.")
@@ -132,13 +140,38 @@ def compute_overall(stats):
     return overall
 
 
-def generate_markdown(stats, relative, cat_summary, overall, results_dir):
+def generate_markdown(stats, relative, cat_summary, overall, results_dir, system_info):
     lines = []
     lines.append("# lua-js-benchmark Report")
     lines.append("")
     lines.append(f"Results from: `{results_dir.name}`")
     lines.append(f"Baseline: **{BASELINE_ENGINE}** (1.00x)")
     lines.append("")
+
+    # Test Environment
+    sys_info = system_info.get("system", {})
+    if sys_info:
+        lines.append("## Test Environment")
+        lines.append("")
+        lines.append("| Item | Value |")
+        lines.append("|------|-------|")
+        lines.append(f"| Date | {sys_info.get('date', '-')} |")
+        lines.append(f"| OS | {sys_info.get('os', '-')} {sys_info.get('kernel', '')} |")
+        lines.append(f"| Architecture | {sys_info.get('arch', '-')} |")
+        lines.append(f"| CPU | {sys_info.get('cpu', '-')} |")
+        lines.append(f"| CPU Cores | {sys_info.get('cpu_cores', '-')} |")
+        lines.append(f"| Memory | {sys_info.get('memory', '-')} |")
+        lines.append("")
+
+    engine_info = system_info.get("engines", {})
+    if engine_info:
+        lines.append("## Engines")
+        lines.append("")
+        lines.append("| Engine | Name | Version |")
+        lines.append("|--------|------|---------|")
+        for eid, edata in engine_info.items():
+            lines.append(f"| {eid} | {edata.get('display_name', eid)} | {edata.get('version', '-')} |")
+        lines.append("")
 
     # Overall
     lines.append("## Overall Performance")
@@ -224,7 +257,7 @@ def generate_markdown(stats, relative, cat_summary, overall, results_dir):
     return report_path
 
 
-def generate_html(stats, relative, cat_summary, overall, results_dir):
+def generate_html(stats, relative, cat_summary, overall, results_dir, system_info):
     engines = sorted(set(e for (e, _) in stats.keys()))
     categories = sorted(set(s["category"] for s in stats.values()))
     benchmarks = sorted(set(b for (_, b) in relative.keys()))
@@ -235,6 +268,7 @@ def generate_html(stats, relative, cat_summary, overall, results_dir):
         "baseline": BASELINE_ENGINE,
         "engines": engines,
         "categories": categories_with_data,
+        "system_info": system_info,
         "overall": overall,
         "category_summary": {
             cat: {e: cat_summary[cat].get(e, {}).get("avg_relative", 0) for e in engines}
@@ -288,13 +322,15 @@ def main():
     rows = load_csv(results_dir)
     print(f"[INFO] Loaded {len(rows)} data points")
 
+    system_info = load_system_info(results_dir)
+
     stats = compute_stats(rows)
     relative = compute_relative(stats)
     cat_summary = compute_category_summary(relative)
     overall = compute_overall(stats)
 
-    generate_markdown(stats, relative, cat_summary, overall, results_dir)
-    generate_html(stats, relative, cat_summary, overall, results_dir)
+    generate_markdown(stats, relative, cat_summary, overall, results_dir, system_info)
+    generate_html(stats, relative, cat_summary, overall, results_dir, system_info)
 
 
 if __name__ == "__main__":

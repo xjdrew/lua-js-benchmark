@@ -32,6 +32,16 @@
 <h1>lua-js-benchmark Report</h1>
 <p class="subtitle">Baseline: <strong>lua</strong> (1.00x) &mdash; lower is better</p>
 
+<div id="envSection" style="display:none;">
+  <h2>Test Environment</h2>
+  <div class="card">
+    <table id="envTable"></table>
+  </div>
+  <div class="card">
+    <table id="enginesTable"></table>
+  </div>
+</div>
+
 <h2>Overall Performance</h2>
 <div class="card">
   <div class="chart-container tall">
@@ -317,6 +327,40 @@ function renderMemory() {
   });
 }
 
+function renderEnvironment() {
+  const info = DATA.system_info;
+  if (!info || !info.system) return;
+
+  document.getElementById('envSection').style.display = 'block';
+
+  const sys = info.system;
+  const table = document.getElementById('envTable');
+  let html = '<tr><th style="width:150px">Item</th><th>Value</th></tr>';
+  html += `<tr><td>Date</td><td>${sys.date || '-'}</td></tr>`;
+  html += `<tr><td>OS</td><td>${sys.os || '-'} ${sys.kernel || ''}</td></tr>`;
+  html += `<tr><td>Architecture</td><td>${sys.arch || '-'}</td></tr>`;
+  html += `<tr><td>CPU</td><td>${sys.cpu || '-'}</td></tr>`;
+  html += `<tr><td>CPU Cores</td><td>${sys.cpu_cores || '-'}</td></tr>`;
+  html += `<tr><td>Memory</td><td>${sys.memory || '-'}</td></tr>`;
+  const cfg = info.config;
+  if (cfg) {
+    html += `<tr><td>Runs</td><td>${cfg.runs}</td></tr>`;
+    html += `<tr><td>Warmup</td><td>${cfg.warmup}</td></tr>`;
+  }
+  table.innerHTML = html;
+
+  const engines = info.engines;
+  if (engines) {
+    const etable = document.getElementById('enginesTable');
+    let ehtml = '<tr><th>Engine</th><th>Name</th><th>Version</th></tr>';
+    for (const [eid, edata] of Object.entries(engines)) {
+      ehtml += `<tr><td>${eid}</td><td>${edata.display_name || eid}</td><td>${edata.version || '-'}</td></tr>`;
+    }
+    etable.innerHTML = ehtml;
+  }
+}
+
+renderEnvironment();
 renderOverall();
 renderCategory();
 renderDetail();

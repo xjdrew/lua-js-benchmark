@@ -10,37 +10,42 @@ mkdir -p "$RUN_DIR"
 
 collect_system_info() {
     local info_file="$RUN_DIR/system_info.txt"
+    local json_file="$RUN_DIR/system_info.json"
+
+    local sys_os sys_kernel sys_arch sys_cpu sys_cores sys_memory sys_date
+    sys_os="$(uname -s)"
+    sys_kernel="$(uname -r)"
+    sys_arch="$(uname -m)"
+    sys_date="$(date -u '+%Y-%m-%d %H:%M:%S UTC')"
+
+    if [[ "$sys_os" == "Linux" ]]; then
+        sys_cpu="$(grep 'model name' /proc/cpuinfo | head -1 | cut -d: -f2 | xargs)"
+        sys_cores="$(nproc)"
+        sys_memory="$(free -h | grep Mem | awk '{print $2}')"
+    elif [[ "$sys_os" == "Darwin" ]]; then
+        sys_cpu="$(sysctl -n machdep.cpu.brand_string 2>/dev/null || echo unknown)"
+        sys_cores="$(sysctl -n hw.ncpu)"
+        sys_memory="$(sysctl -n hw.memsize | awk '{print int($1/1024/1024/1024) "GB"}')"
+    else
+        sys_cpu="unknown"
+        sys_cores="1"
+        sys_memory="unknown"
+    fi
+
     {
         echo "=== System Information ==="
-        echo "Date: $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
-        echo "OS: $(uname -s)"
-        echo "Kernel: $(uname -r)"
-        echo "Architecture: $(uname -m)"
-
-        if [[ "$(uname -s)" == "Linux" ]]; then
-            echo "CPU: $(grep 'model name' /proc/cpuinfo | head -1 | cut -d: -f2 | xargs)"
-            echo "CPU Cores: $(nproc)"
-            echo "Memory: $(free -h | grep Mem | awk '{print $2}')"
-        elif [[ "$(uname -s)" == "Darwin" ]]; then
-            echo "CPU: $(sysctl -n machdep.cpu.brand_string 2>/dev/null || echo unknown)"
-            echo "CPU Cores: $(sysctl -n hw.ncpu)"
-            echo "Memory: $(sysctl -n hw.memsize | awk '{print int($1/1024/1024/1024) "GB"}')"
-        fi
-
+        echo "Date: $sys_date"
+        echo "OS: $sys_os"
+        echo "Kernel: $sys_kernel"
+        echo "Architecture: $sys_arch"
+        echo "CPU: $sys_cpu"
+        echo "CPU Cores: $sys_cores"
+        echo "Memory: $sys_memory"
         echo ""
         echo "=== Engine Versions ==="
         for engine in $(get_available_engines); do
-            local bin="${ENGINE_BIN[$engine]}"
-            local args="${ENGINE_ARGS[$engine]}"
-            echo -n "$engine: "
-            case "$engine" in
-                lua)       "$bin" -v 2>&1 || true ;;
-                luajit)    "$bin" -v 2>&1 | head -1 || true ;;
-                quickjs)   "$bin" --help 2>&1 | head -1 || true ;;
-                v8|v8-nojit) "$bin" $args --version 2>&1 || echo "unknown" ;;
-            esac
+            echo "$engine: $(get_engine_version "$engine")"
         done
-
         echo ""
         echo "=== Benchmark Config ==="
         echo "RUNS: $RUNS"
@@ -49,7 +54,46 @@ collect_system_info() {
         echo "CATEGORY: ${CATEGORY:-all}"
     } > "$info_file"
 
+    local engines_json=""
+    for engine in $(get_available_engines); do
+        local version display_name
+        version="$(get_engine_version "$engine")"
+        display_name="${ENGINE_DISPLAY_NAME[$engine]:-$engine}"
+        engines_json="$engines_json|$engine|$display_name|$version"
+    done
+
+    python3 -c "
+import json, sys
+system = {
+    'date': sys.argv[1],
+    'os': sys.argv[2],
+    'kernel': sys.argv[3],
+    'arch': sys.argv[4],
+    'cpu': sys.argv[5],
+    'cpu_cores': int(sys.argv[6]),
+    'memory': sys.argv[7],
+}
+config = {
+    'runs': int(sys.argv[8]),
+    'warmup': int(sys.argv[9]),
+    'category': sys.argv[10],
+}
+engines = {}
+raw = sys.argv[11]
+if raw:
+    parts = raw.split('|')[1:]
+    i = 0
+    while i + 2 < len(parts):
+        eid, dname, ver = parts[i], parts[i+1], parts[i+2]
+        engines[eid] = {'display_name': dname, 'version': ver}
+        i += 3
+data = {'system': system, 'engines': engines, 'config': config}
+print(json.dumps(data, indent=2))
+" "$sys_date" "$sys_os" "$sys_kernel" "$sys_arch" "$sys_cpu" "$sys_cores" "$sys_memory" \
+  "$RUNS" "$WARMUP" "${CATEGORY:-all}" "$engines_json" > "$json_file"
+
     echo "[INFO]  System info saved to $info_file"
+    echo "[INFO]  System info JSON saved to $json_file"
 }
 
 CSV_FILE="$RUN_DIR/raw.csv"

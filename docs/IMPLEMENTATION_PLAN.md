@@ -11,7 +11,7 @@
 | Phase 3 | 测试框架与首批用例 | **已完成** |
 | Phase 4 | 完整用例集 | **已完成** |
 | Phase 5 | 报告生成 | **已完成** |
-| Phase 6 | 打磨与文档 | 未开始 |
+| Phase 6 | 打磨与文档 | **进行中** (文档已完成，CI 待添加) |
 
 ---
 
@@ -313,12 +313,17 @@
 
 ### 6.1 文档完善
 
-- [ ] 完善 README.md
-  - [ ] 详细使用说明（setup / bench / report / 选择性运行）
-  - [ ] 系统要求和各平台依赖安装指南
-  - [ ] 如何添加新引擎 / 新测试用例
-  - [ ] FAQ（V8 编译常见问题、如何跳过特定引擎等）
-- [ ] 添加 benchmarks/README.md（测试用例来源、算法说明、等价性保证）
+- [x] 完善 README.md
+  - [x] 详细使用说明（setup / bench / report / 选择性运行）
+  - [x] 系统要求和各平台依赖安装指南
+  - [x] 如何添加新引擎 / 新测试用例
+  - [x] FAQ（V8 编译常见问题、如何跳过特定引擎等）
+- [x] 添加 LICENSE (MIT)
+- [x] 添加 CONTRIBUTING.md
+- [x] 添加 CHANGELOG.md
+- [x] 添加 .editorconfig
+- [x] 将规划文档移动到 docs/ 目录
+- [ ] 添加 benchmarks/README.md（测试用例来源、算法说明、等价性保证）（可选）
 
 ### 6.2 CI 集成
 
