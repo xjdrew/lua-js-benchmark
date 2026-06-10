@@ -1,7 +1,7 @@
 // Ackermann function benchmark
 
 var print = typeof console !== 'undefined' ? console.log.bind(console) : globalThis.print;
-var DEFAULT = 9;
+var DEFAULT = 10;
 var M = parseInt(typeof scriptArgs !== 'undefined' ? scriptArgs[1] : (typeof process !== 'undefined' ? process.argv[2] : '0')) || DEFAULT;
 
 function ack(m, n) {

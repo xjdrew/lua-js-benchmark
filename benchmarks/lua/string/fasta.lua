@@ -1,7 +1,8 @@
 -- FASTA benchmark - generate random DNA sequences
 -- Uses linear congruential generator
 
-local N = tonumber(arg and arg[1]) or 1000000
+local N = tonumber(arg and arg[1]) or 5000000
+collectgarbage("collect")
 
 local IM = 139968
 local IA = 3877

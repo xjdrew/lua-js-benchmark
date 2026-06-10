@@ -2,7 +2,7 @@
 // Uses linear congruential generator
 
 var print = typeof console !== 'undefined' ? console.log.bind(console) : globalThis.print;
-var DEFAULT = 1000000;
+var DEFAULT = 5000000;
 var N = parseInt(typeof scriptArgs !== 'undefined' ? scriptArgs[1] : (typeof process !== 'undefined' ? process.argv[2] : '0')) || DEFAULT;
 
 var IM = 139968;

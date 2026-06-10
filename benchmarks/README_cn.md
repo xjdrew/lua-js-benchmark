@@ -2,7 +2,7 @@
 
 [English](README.md)
 
-本目录包含 7 个分类、共 16 个基准测试用例。每个用例同时有 Lua 和 JavaScript 两个实现，对相同输入产生**完全一致的输出**，确保公平对比。
+本目录包含 7 个分类、共 20 个基准测试用例。每个用例同时有 Lua 和 JavaScript 两个实现，对相同输入产生**完全一致的输出**，确保公平对比。
 
 ## 目录结构
 
@@ -39,6 +39,7 @@ Runner 以 `lua/` 目录为准自动发现测试用例，通过分类映射（`t
 | nbody | [Benchmarks Game](https://benchmarksgame-team.pages.debian.net/benchmarksgame/) | N 体模拟：木星行星轨道的蛙跳积分模拟 |
 | spectral_norm | [Benchmarks Game](https://benchmarksgame-team.pages.debian.net/benchmarksgame/) | 谱范数：计算无穷矩阵的最大奇异值 |
 | fannkuch | [Benchmarks Game](https://benchmarksgame-team.pages.debian.net/benchmarksgame/) | Fannkuch-redux：生成排列并计算翻饼次数 |
+| matrix | 原创 | 矩阵乘法（200×200，3 轮）使用表的表实现 |
 
 ### string — 字符串操作
 
@@ -54,6 +55,7 @@ Runner 以 `lua/` 目录为准自动发现测试用例，通过分类映射（`t
 |------|------|------|
 | binary_trees | [Benchmarks Game](https://benchmarksgame-team.pages.debian.net/benchmarksgame/) | 分配和释放递增深度的二叉树 |
 | object_churn | 原创 | 创建 N 个含 3 个字段的小表/对象并求和 |
+| gc_stress | 原创 | 混合短/长生命周期对象分配 — 测试 GC 吞吐量 |
 
 ### table — 哈希表 / 对象属性操作
 
@@ -61,14 +63,16 @@ Runner 以 `lua/` 目录为准自动发现测试用例，通过分类映射（`t
 |------|------|------|
 | table_insert | 原创 | 向表/对象插入 N 个键值对，然后求和 |
 | array_access | 原创 | 创建数组、求和、原地反转、再求和 |
+| table_ops | 原创 | 混合表操作：字符串键插入、嵌套查找、遍历、删除、合并 |
 
 ### call — 函数调用开销与递归
 
 | 用例 | 来源 | 说明 |
 |------|------|------|
-| ackermann | 经典 | Ackermann 函数 `ack(3, 9)` — 深度递归压力测试 |
+| ackermann | 经典 | Ackermann 函数 `ack(3, 10)` — 深度递归压力测试 |
 | fibonacci | 经典 | 朴素递归斐波那契 — 函数调用开销测量 |
-| queens | 经典 | N 皇后问题 — 求 N=12 的所有解 |
+| queens | 经典 | N 皇后问题 — 求 N=13 的所有解 |
+| method_dispatch | 原创 | Metatable/原型方法派发 — 多态 OOP 模式 |
 
 ### coroutine — 协程 / 生成器上下文切换
 

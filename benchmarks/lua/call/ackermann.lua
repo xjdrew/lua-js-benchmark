@@ -1,6 +1,7 @@
 -- Ackermann function benchmark
 
-local M = tonumber(arg and arg[1]) or 9
+local M = tonumber(arg and arg[1]) or 10
+collectgarbage("collect")
 
 local function ack(m, n)
     if m == 0 then

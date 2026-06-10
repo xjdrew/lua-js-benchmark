@@ -2,7 +2,7 @@
 // Build a JSON string of N objects and parse it with JSON.parse
 
 var print = typeof console !== 'undefined' ? console.log.bind(console) : globalThis.print;
-var DEFAULT = 10000;
+var DEFAULT = 100000;
 var N = parseInt(typeof scriptArgs !== 'undefined' ? scriptArgs[1] : (typeof process !== 'undefined' ? process.argv[2] : '0')) || DEFAULT;
 
 // Build JSON string

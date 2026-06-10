@@ -1,1 +1,1 @@
-14200 solutions for 12-queens
+73712 solutions for 13-queens

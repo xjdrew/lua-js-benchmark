@@ -2,7 +2,7 @@
 // Count all solutions to the N-queens problem
 
 var print = typeof console !== 'undefined' ? console.log.bind(console) : globalThis.print;
-var DEFAULT = 12;
+var DEFAULT = 13;
 var N = parseInt(typeof scriptArgs !== 'undefined' ? scriptArgs[1] : (typeof process !== 'undefined' ? process.argv[2] : '0')) || DEFAULT;
 
 var count = 0;

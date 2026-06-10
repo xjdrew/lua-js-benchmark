@@ -1,7 +1,8 @@
 -- JSON parse benchmark
 -- Build a JSON string of N objects and parse it with recursive descent parser
 
-local N = tonumber(arg and arg[1]) or 10000
+local N = tonumber(arg and arg[1]) or 100000
+collectgarbage("collect")
 
 -- Build JSON string
 local parts = {}

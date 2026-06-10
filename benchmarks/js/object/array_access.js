@@ -2,7 +2,7 @@
 // Create array, sum elements, reverse in-place, sum again
 
 var print = typeof console !== 'undefined' ? console.log.bind(console) : globalThis.print;
-var DEFAULT = 5000000;
+var DEFAULT = 20000000;
 var N = parseInt(typeof scriptArgs !== 'undefined' ? scriptArgs[1] : (typeof process !== 'undefined' ? process.argv[2] : '0')) || DEFAULT;
 
 var arr = new Array(N);

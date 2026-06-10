@@ -45,11 +45,11 @@ Reports are saved to `results/<timestamp>/`:
 
 | Category | Benchmarks | What it tests |
 |----------|-----------|---------------|
-| **compute** | mandelbrot, n-body, spectral-norm, fannkuch-redux | CPU-bound numeric computation |
+| **compute** | mandelbrot, n-body, spectral-norm, fannkuch-redux, matrix | CPU-bound numeric computation |
 | **string** | fasta, json-parse, string-concat | String operations and pattern matching |
-| **alloc** | binary-trees, object-churn | GC pressure and memory allocation |
-| **table** | table-insert, array-access | Hash table / object property operations |
-| **call** | ackermann, fibonacci, n-queens | Function call overhead and recursion |
+| **alloc** | binary-trees, object-churn, gc-stress | GC pressure and memory allocation |
+| **table** | table-insert, array-access, table-ops | Hash table / object property operations |
+| **call** | ackermann, fibonacci, n-queens, method-dispatch | Function call overhead and recursion |
 | **coroutine** | scheduler | Coroutine / generator context switching |
 | **startup** | empty | Engine cold-start time |
 

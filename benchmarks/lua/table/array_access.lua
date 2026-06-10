@@ -1,7 +1,8 @@
 -- Array access benchmark
 -- Create array, sum elements, reverse in-place, sum again
 
-local N = tonumber(arg and arg[1]) or 5000000
+local N = tonumber(arg and arg[1]) or 20000000
+collectgarbage("collect")
 
 local arr = {}
 for i = 1, N do

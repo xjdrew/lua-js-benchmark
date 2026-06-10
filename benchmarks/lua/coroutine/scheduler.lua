@@ -1,7 +1,8 @@
 -- Coroutine scheduler benchmark
 -- Create 100 coroutines, each counting from 0 to N/100, round-robin schedule
 
-local N = tonumber(arg and arg[1]) or 100000
+local N = tonumber(arg and arg[1]) or 5000000
+collectgarbage("collect")
 
 local num_coroutines = 100
 local per_coroutine = math.floor(N / num_coroutines)

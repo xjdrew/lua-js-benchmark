@@ -2,7 +2,7 @@
 // Compute spectral norm approximation for size N
 
 var print = typeof console !== 'undefined' ? console.log.bind(console) : globalThis.print;
-var DEFAULT = 500;
+var DEFAULT = 1000;
 var N = parseInt(typeof scriptArgs !== 'undefined' ? scriptArgs[1] : (typeof process !== 'undefined' ? process.argv[2] : '0')) || DEFAULT;
 
 function A(i, j) {

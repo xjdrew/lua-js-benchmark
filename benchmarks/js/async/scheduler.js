@@ -2,7 +2,7 @@
 // Create 100 generators, each counting from 0 to N/100, round-robin schedule
 
 var print = typeof console !== 'undefined' ? console.log.bind(console) : globalThis.print;
-var DEFAULT = 100000;
+var DEFAULT = 5000000;
 var N = parseInt(typeof scriptArgs !== 'undefined' ? scriptArgs[1] : (typeof process !== 'undefined' ? process.argv[2] : '0')) || DEFAULT;
 
 var numGenerators = 100;

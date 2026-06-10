@@ -4,7 +4,8 @@
 
 local sqrt = math.sqrt
 
-local N = tonumber(arg and arg[1]) or 500
+local N = tonumber(arg and arg[1]) or 1000
+collectgarbage("collect")
 
 -- Element of the infinite matrix A
 -- A(i,j) = 1 / ((i+j)(i+j+1)/2 + i + 1)  (0-indexed i,j)

@@ -2,6 +2,7 @@
 -- Insert N key-value pairs, then sum all values
 
 local N = tonumber(arg and arg[1]) or 1000000
+collectgarbage("collect")
 
 local t = {}
 for i = 1, N do

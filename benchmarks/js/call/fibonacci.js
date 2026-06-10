@@ -1,7 +1,7 @@
 // Naive recursive Fibonacci benchmark
 
 var print = typeof console !== 'undefined' ? console.log.bind(console) : globalThis.print;
-var DEFAULT = 35;
+var DEFAULT = 38;
 var N = parseInt(typeof scriptArgs !== 'undefined' ? scriptArgs[1] : (typeof process !== 'undefined' ? process.argv[2] : '0')) || DEFAULT;
 
 function fib(n) {

@@ -3,7 +3,7 @@
 // Iteration limit: 50, escape radius: 4.0
 
 var print = typeof console !== 'undefined' ? console.log.bind(console) : globalThis.print;
-var DEFAULT = 1000;
+var DEFAULT = 1500;
 var N = parseInt(typeof scriptArgs !== 'undefined' ? scriptArgs[1] : (typeof process !== 'undefined' ? process.argv[2] : '0')) || DEFAULT;
 
 function mandelbrot(size) {

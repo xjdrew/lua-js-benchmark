@@ -3,8 +3,9 @@
 -- Mandelbrot set benchmark
 -- Compute NxN grid, count pixels inside the set
 
-local N = tonumber(arg and arg[1]) or 1000
+local N = tonumber(arg and arg[1]) or 1500
 local MAX_ITER = 50
+collectgarbage("collect")
 
 local count = 0
 

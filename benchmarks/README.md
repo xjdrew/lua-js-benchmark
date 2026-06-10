@@ -2,7 +2,7 @@
 
 [中文版](README_cn.md)
 
-This directory contains 16 benchmark cases across 7 categories. Each benchmark has both a Lua and a JavaScript implementation that produce **identical output** for the same input, ensuring a fair comparison.
+This directory contains 20 benchmark cases across 7 categories. Each benchmark has both a Lua and a JavaScript implementation that produce **identical output** for the same input, ensuring a fair comparison.
 
 ## Directory Structure
 
@@ -39,6 +39,7 @@ The Lua directory is the canonical source for benchmark discovery. The runner sc
 | nbody | [Benchmarks Game](https://benchmarksgame-team.pages.debian.net/benchmarksgame/) | N-body simulation: Jovian planet orbit simulation using leapfrog integration |
 | spectral_norm | [Benchmarks Game](https://benchmarksgame-team.pages.debian.net/benchmarksgame/) | Spectral norm: compute the largest singular value of an infinite matrix |
 | fannkuch | [Benchmarks Game](https://benchmarksgame-team.pages.debian.net/benchmarksgame/) | Fannkuch-redux: generate permutations and count pancake flips |
+| matrix | Original | Matrix multiplication (200×200, 3 rounds) using table-of-tables |
 
 ### string — String operations
 
@@ -54,6 +55,7 @@ The Lua directory is the canonical source for benchmark discovery. The runner sc
 |-----------|--------|-------------|
 | binary_trees | [Benchmarks Game](https://benchmarksgame-team.pages.debian.net/benchmarksgame/) | Allocate and deallocate binary trees of increasing depth |
 | object_churn | Original | Create N small tables/objects with 3 fields and sum all values |
+| gc_stress | Original | Mixed short/long lived allocations — tests GC throughput under realistic pressure |
 
 ### table — Hash table / object property operations
 
@@ -61,14 +63,16 @@ The Lua directory is the canonical source for benchmark discovery. The runner sc
 |-----------|--------|-------------|
 | table_insert | Original | Insert N key-value pairs into a table/object, then sum all values |
 | array_access | Original | Create array, sum elements, reverse in-place, sum again |
+| table_ops | Original | Mixed operations: string-key insert, nested lookup, iteration, delete, merge |
 
 ### call — Function call overhead and recursion
 
 | Benchmark | Source | Description |
 |-----------|--------|-------------|
-| ackermann | Classic | Ackermann function `ack(3, 9)` — deep recursion stress test |
+| ackermann | Classic | Ackermann function `ack(3, 10)` — deep recursion stress test |
 | fibonacci | Classic | Naive recursive Fibonacci — function call overhead measurement |
-| queens | Classic | N-queens problem — count all solutions for N=12 |
+| queens | Classic | N-queens problem — count all solutions for N=13 |
+| method_dispatch | Original | Metatable/prototype method dispatch — polymorphic OOP patterns |
 
 ### coroutine — Coroutine / generator context switching
 

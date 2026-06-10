@@ -2,7 +2,7 @@
 // Create N small objects with 3 fields and sum all values
 
 var print = typeof console !== 'undefined' ? console.log.bind(console) : globalThis.print;
-var DEFAULT = 1000000;
+var DEFAULT = 10000000;
 var N = parseInt(typeof scriptArgs !== 'undefined' ? scriptArgs[1] : (typeof process !== 'undefined' ? process.argv[2] : '0')) || DEFAULT;
 
 var sum = 0;
