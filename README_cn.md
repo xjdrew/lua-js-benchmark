@@ -52,7 +52,7 @@ make report   # 生成 Markdown + HTML 报告
 | **coroutine** | scheduler | 协程 / 生成器上下文切换 |
 | **startup** | empty | 引擎冷启动时间 |
 
-每个测试用例都有 Lua 和 JavaScript 两个版本，且输出完全一致。详见 [benchmarks/README.md](benchmarks/README.md) 了解每个用例的来源、算法说明和编写规范。
+每个测试用例都有 Lua 和 JavaScript 两个版本，且输出完全一致。详见 [benchmarks/README_cn.md](benchmarks/README_cn.md) 了解每个用例的来源、算法说明和编写规范。
 
 ## 系统要求
 
