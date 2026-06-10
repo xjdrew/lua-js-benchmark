@@ -90,7 +90,7 @@ sudo pacman -S --needed base-devel git curl python python-pip time ninja
 **macOS:**
 ```bash
 xcode-select --install
-brew install git curl python3 ninja
+brew install bash git curl python3 ninja
 ```
 </details>
 

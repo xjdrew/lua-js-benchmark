@@ -1,4 +1,4 @@
-SHELL := /bin/bash
+SHELL := $(shell which bash)
 ROOT_DIR := $(shell pwd)
 SCRIPTS_DIR := $(ROOT_DIR)/scripts
 BUILD_DIR := $(ROOT_DIR)/.build

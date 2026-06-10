@@ -44,6 +44,10 @@ check_either() {
 echo "=== Checking dependencies ==="
 echo ""
 
+if [[ "${BASH_VERSINFO[0]}" -lt 4 ]]; then
+    MISSING_REQUIRED+=("bash >= 4.0: associative arrays (current: $BASH_VERSION)")
+fi
+
 check_either curl wget "HTTP download tool" || true
 check_cmd git "Version control" || true
 check_either gcc clang "C compiler" || true

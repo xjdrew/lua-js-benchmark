@@ -27,7 +27,7 @@ jobs:
       - name: Install dependencies (macOS)
         if: runner.os == 'macOS'
         run: |
-          brew install python3
+          brew install bash python3
 
       - name: Setup engines
         run: make setup ENGINES="lua luajit quickjs"
