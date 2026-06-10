@@ -4,6 +4,8 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/detect_platform.sh"
 
+ENGINES="${ENGINES:-lua luajit quickjs v8}"
+
 MISSING_REQUIRED=()
 MISSING_OPTIONAL=()
 
@@ -42,32 +44,28 @@ check_either() {
 echo "=== Checking dependencies ==="
 echo ""
 
-check_either curl wget "HTTP download tool"
-check_cmd git "Version control"
-check_either gcc clang "C compiler"
-check_either g++ clang++ "C++ compiler (for V8)" no
-check_cmd make "Build tool"
-check_cmd python3 "Report generation"
+check_either curl wget "HTTP download tool" || true
+check_cmd git "Version control" || true
+check_either gcc clang "C compiler" || true
+check_either g++ clang++ "C++ compiler (for V8)" no || true
+check_cmd make "Build tool" || true
+check_cmd python3 "Report generation" || true
 
 if [[ "$LJB_OS" == "linux" ]]; then
-    if [[ -x /usr/bin/time ]]; then
-        true
-    else
+    if [[ ! -x /usr/bin/time ]]; then
         MISSING_REQUIRED+=("/usr/bin/time: GNU time (performance measurement)")
-    fi
-elif [[ "$LJB_OS" == "darwin" ]]; then
-    if [[ -x /usr/bin/time ]]; then
-        true
     fi
 fi
 
 needs_v8=no
 for e in $ENGINES; do
-    [[ "$e" == "v8" ]] && needs_v8=yes
+    if [[ "$e" == "v8" ]]; then
+        needs_v8=yes
+    fi
 done
 
 if [[ "$needs_v8" == "yes" ]]; then
-    check_cmd ninja "Build tool (required for V8)" no
+    check_cmd ninja "Build tool (required for V8)" no || true
 fi
 
 if [[ ${#MISSING_REQUIRED[@]} -gt 0 ]] || [[ ${#MISSING_OPTIONAL[@]} -gt 0 ]]; then

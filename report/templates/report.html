@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>lua-js-benchmark Report</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; color: #333; padding: 20px; }
+  h1 { text-align: center; margin: 20px 0; color: #1a1a2e; }
+  h2 { margin: 30px 0 15px; color: #16213e; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; }
+  .container { max-width: 1200px; margin: 0 auto; }
+  .card { background: white; border-radius: 8px; padding: 20px; margin: 15px 0; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+  .chart-container { position: relative; height: 400px; }
+  .chart-container.tall { height: 500px; }
+  table { width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 14px; }
+  th, td { padding: 8px 12px; border: 1px solid #e2e8f0; text-align: right; }
+  th { background: #f8fafc; font-weight: 600; }
+  td:first-child, th:first-child { text-align: left; }
+  tr:nth-child(even) { background: #f8fafc; }
+  .baseline { color: #666; font-style: italic; }
+  .faster { color: #059669; font-weight: 600; }
+  .slower { color: #dc2626; }
+  .rank { font-weight: 700; font-size: 18px; }
+  .subtitle { text-align: center; color: #666; margin-bottom: 20px; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<h1>lua-js-benchmark Report</h1>
+<p class="subtitle">Baseline: <strong>lua</strong> (1.00x) &mdash; lower is better</p>
+
+<h2>Overall Performance</h2>
+<div class="card">
+  <div class="chart-container tall">
+    <canvas id="overallChart"></canvas>
+  </div>
+</div>
+
+<div class="card">
+  <table id="overallTable"></table>
+</div>
+
+<h2>Performance by Category</h2>
+<div class="card">
+  <div class="chart-container">
+    <canvas id="categoryChart"></canvas>
+  </div>
+</div>
+
+<h2>Detailed Results</h2>
+<div class="card">
+  <div class="chart-container tall">
+    <canvas id="detailChart"></canvas>
+  </div>
+</div>
+
+<div class="card">
+  <table id="detailTable"></table>
+</div>
+
+<h2>Radar: Strengths & Weaknesses</h2>
+<div class="card">
+  <div class="chart-container">
+    <canvas id="radarChart"></canvas>
+  </div>
+</div>
+
+<h2>Memory Usage (Peak RSS)</h2>
+<div class="card">
+  <div class="chart-container tall">
+    <canvas id="memoryChart"></canvas>
+  </div>
+</div>
+
+</div>
+
+<script>
+const DATA = /*__CHART_DATA__*/{};
+
+const COLORS = {
+  'lua':       { bg: 'rgba(59,130,246,0.7)',  border: '#3b82f6'  },
+  'luajit':    { bg: 'rgba(16,185,129,0.7)',  border: '#10b981'  },
+  'quickjs':   { bg: 'rgba(245,158,11,0.7)',  border: '#f59e0b'  },
+  'v8':        { bg: 'rgba(239,68,68,0.7)',   border: '#ef4444'  },
+  'v8-nojit':  { bg: 'rgba(168,85,247,0.7)',  border: '#a855f7'  },
+};
+
+const CAT_COLORS = [
+  'rgba(59,130,246,0.8)',
+  'rgba(16,185,129,0.8)',
+  'rgba(245,158,11,0.8)',
+  'rgba(239,68,68,0.8)',
+  'rgba(168,85,247,0.8)',
+  'rgba(236,72,153,0.8)',
+  'rgba(107,114,128,0.8)',
+];
+
+function getColor(engine) {
+  return COLORS[engine] || { bg: 'rgba(107,114,128,0.7)', border: '#6b7280' };
+}
+
+// Overall stacked bar chart
+function renderOverall() {
+  const overall = DATA.overall;
+  const labels = overall.map(o => o.engine);
+  const categories = DATA.categories;
+
+  const datasets = categories.map((cat, i) => ({
+    label: cat,
+    data: overall.map(o => (o.category_breakdown[cat] || 0)),
+    backgroundColor: CAT_COLORS[i % CAT_COLORS.length],
+  }));
+
+  new Chart(document.getElementById('overallChart'), {
+    type: 'bar',
+    data: { labels, datasets },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        x: { stacked: true },
+        y: { stacked: true, title: { display: true, text: 'Total Time (ms)' } },
+      },
+      plugins: {
+        title: { display: true, text: 'Overall Performance (stacked by category) — lower is better' },
+        tooltip: {
+          callbacks: {
+            afterBody: function(items) {
+              const idx = items[0].dataIndex;
+              const o = overall[idx];
+              return `\nTotal: ${o.total_ms.toFixed(0)} ms (${o.relative.toFixed(2)}x vs ${DATA.baseline})`;
+            }
+          }
+        }
+      }
+    }
+  });
+
+  // Overall table
+  const table = document.getElementById('overallTable');
+  let html = '<tr><th>Rank</th><th>Engine</th><th>Total Time (ms)</th><th>vs ' + DATA.baseline + '</th></tr>';
+  overall.forEach((o, i) => {
+    const cls = o.engine === DATA.baseline ? 'baseline' : (o.relative < 1 ? 'faster' : 'slower');
+    html += `<tr><td class="rank">#${i+1}</td><td>${o.engine}</td><td>${o.total_ms.toFixed(0)}</td><td class="${cls}">${o.relative.toFixed(2)}x</td></tr>`;
+  });
+  table.innerHTML = html;
+}
+
+// Category grouped bar chart
+function renderCategory() {
+  const categories = Object.keys(DATA.category_summary);
+  const engines = DATA.engines;
+
+  const datasets = engines.map(engine => ({
+    label: engine,
+    data: categories.map(cat => DATA.category_summary[cat][engine] || 0),
+    backgroundColor: getColor(engine).bg,
+    borderColor: getColor(engine).border,
+    borderWidth: 1,
+  }));
+
+  new Chart(document.getElementById('categoryChart'), {
+    type: 'bar',
+    data: { labels: categories, datasets },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        y: { title: { display: true, text: 'Relative to ' + DATA.baseline + ' (1.0x)' } },
+      },
+      plugins: {
+        title: { display: true, text: 'Performance by Category (relative to ' + DATA.baseline + ')' },
+        annotation: {
+          annotations: {
+            baseline: { type: 'line', yMin: 1, yMax: 1, borderColor: '#333', borderDash: [5,5] }
+          }
+        }
+      }
+    }
+  });
+}
+
+// Detail chart
+function renderDetail() {
+  const benchmarks = DATA.benchmarks;
+  const labels = benchmarks.map(b => b.name);
+  const engines = DATA.engines;
+
+  const datasets = engines.map(engine => ({
+    label: engine,
+    data: benchmarks.map(b => b[engine] ? b[engine].wall_ms : 0),
+    backgroundColor: getColor(engine).bg,
+    borderColor: getColor(engine).border,
+    borderWidth: 1,
+  }));
+
+  new Chart(document.getElementById('detailChart'), {
+    type: 'bar',
+    data: { labels, datasets },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      indexAxis: 'y',
+      scales: {
+        x: { title: { display: true, text: 'Time (ms)' } },
+      },
+      plugins: {
+        title: { display: true, text: 'All Benchmarks — Absolute Time (ms)' },
+      }
+    }
+  });
+
+  // Detail table
+  const table = document.getElementById('detailTable');
+  let html = '<tr><th>Benchmark</th><th>Category</th><th>' + DATA.baseline + ' (ms)</th>';
+  engines.filter(e => e !== DATA.baseline).forEach(e => { html += `<th>${e}</th>`; });
+  html += '</tr>';
+
+  benchmarks.forEach(b => {
+    const base = b[DATA.baseline];
+    html += `<tr><td>${b.name}</td><td>${b.category}</td>`;
+    html += `<td>${base ? base.wall_ms.toFixed(0) : '-'}</td>`;
+    engines.filter(e => e !== DATA.baseline).forEach(e => {
+      const d = b[e];
+      if (d) {
+        const cls = d.relative < 1 ? 'faster' : (d.relative > 1 ? 'slower' : '');
+        html += `<td class="${cls}">${d.relative.toFixed(2)}x</td>`;
+      } else {
+        html += '<td>-</td>';
+      }
+    });
+    html += '</tr>';
+  });
+  table.innerHTML = html;
+}
+
+// Radar chart
+function renderRadar() {
+  const categories = Object.keys(DATA.category_summary);
+  const engines = DATA.engines;
+
+  const datasets = engines.map(engine => {
+    const color = getColor(engine);
+    return {
+      label: engine,
+      data: categories.map(cat => {
+        const val = DATA.category_summary[cat][engine] || 1;
+        return 1 / val;
+      }),
+      backgroundColor: color.bg.replace('0.7', '0.2'),
+      borderColor: color.border,
+      borderWidth: 2,
+      pointRadius: 4,
+    };
+  });
+
+  new Chart(document.getElementById('radarChart'), {
+    type: 'radar',
+    data: { labels: categories, datasets },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        r: {
+          beginAtZero: true,
+          ticks: { display: false },
+        }
+      },
+      plugins: {
+        title: { display: true, text: 'Engine Strengths (higher = faster, 1/relative)' },
+        tooltip: {
+          callbacks: {
+            label: function(ctx) {
+              const cat = categories[ctx.dataIndex];
+              const engine = ctx.dataset.label;
+              const rel = DATA.category_summary[cat][engine] || 0;
+              return `${engine}: ${rel.toFixed(2)}x vs ${DATA.baseline}`;
+            }
+          }
+        }
+      }
+    }
+  });
+}
+
+// Memory chart
+function renderMemory() {
+  const mem = DATA.memory;
+  const labels = mem.map(m => m.name);
+  const engines = DATA.engines;
+
+  const datasets = engines.map(engine => ({
+    label: engine,
+    data: mem.map(m => m[engine] || 0),
+    backgroundColor: getColor(engine).bg,
+    borderColor: getColor(engine).border,
+    borderWidth: 1,
+  }));
+
+  new Chart(document.getElementById('memoryChart'), {
+    type: 'bar',
+    data: { labels, datasets },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      indexAxis: 'y',
+      scales: {
+        x: { title: { display: true, text: 'Peak RSS (KB)' } },
+      },
+      plugins: {
+        title: { display: true, text: 'Memory Usage — Peak Resident Set Size (KB)' },
+      }
+    }
+  });
+}
+
+renderOverall();
+renderCategory();
+renderDetail();
+renderRadar();
+renderMemory();
+</script>
+</body>
+</html>
