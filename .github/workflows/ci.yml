@@ -38,13 +38,6 @@ jobs:
           .build/engines/luajit/bin/luajit -v
           .build/engines/quickjs/bin/qjs --help 2>&1 | head -1
 
-      - name: Debug time output format (macOS)
-        if: runner.os == 'macOS'
-        run: |
-          echo "=== /usr/bin/time -l format test ==="
-          /usr/bin/time -l .build/engines/lua/bin/lua -e 'print("hello")' 2>&1 || true
-          echo "=== end ==="
-
       - name: Run benchmarks
         run: make bench ENGINES="lua luajit quickjs" RUNS=2 WARMUP=1
 
