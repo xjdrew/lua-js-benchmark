@@ -1,5 +1,9 @@
 # lua-js-benchmark
 
+[![CI](https://github.com/xjdrew/lua-js-benchmark/actions/workflows/ci.yml/badge.svg)](https://github.com/xjdrew/lua-js-benchmark/actions/workflows/ci.yml)
+
+[中文版](README_cn.md)
+
 Automated performance comparison of Lua and JavaScript engines. Build from source, run standardized benchmarks, and generate visual reports — all with a single command.
 
 ## Engines
@@ -17,7 +21,7 @@ Automated performance comparison of Lua and JavaScript engines. Build from sourc
 ## Quick Start
 
 ```bash
-git clone https://github.com/user/lua-js-benchmark.git
+git clone https://github.com/xjdrew/lua-js-benchmark.git
 cd lua-js-benchmark
 
 # One command does everything: check deps → download source → build → benchmark → report
@@ -48,7 +52,7 @@ Reports are saved to `results/<timestamp>/`:
 | **coroutine** | scheduler | Coroutine / generator context switching |
 | **startup** | empty | Engine cold-start time |
 
-Each benchmark has both a Lua and a JavaScript implementation with verified identical output.
+Each benchmark has both a Lua and a JavaScript implementation with verified identical output. See [benchmarks/README.md](benchmarks/README.md) for detailed descriptions, sources, and conventions.
 
 ## System Requirements
 

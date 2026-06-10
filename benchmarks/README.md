@@ -1,5 +1,7 @@
 # Benchmarks
 
+[中文版](README_cn.md)
+
 This directory contains 16 benchmark cases across 7 categories. Each benchmark has both a Lua and a JavaScript implementation that produce **identical output** for the same input, ensuring a fair comparison.
 
 ## Directory Structure
