@@ -45,11 +45,11 @@ make report   # 生成 Markdown + HTML 报告
 
 | 分类 | 测试用例 | 测试内容 |
 |------|---------|---------|
-| **compute** | mandelbrot, n-body, spectral-norm, fannkuch-redux, matrix | CPU 密集型数值计算 |
+| **compute** | mandelbrot, n-body, spectral-norm, fannkuch-redux, matrix, sieve | CPU 密集型数值计算 |
 | **string** | fasta, json-parse, string-concat | 字符串操作 |
 | **alloc** | binary-trees, object-churn, gc-stress | GC 压力与内存分配 |
 | **table** | table-insert, array-access, table-ops | 哈希表 / 对象属性操作 |
-| **call** | ackermann, fibonacci, n-queens, method-dispatch | 函数调用开销与递归 |
+| **call** | ackermann, fibonacci, n-queens, method-dispatch, tak, closure | 函数调用、递归与闭包 |
 | **coroutine** | scheduler | 协程 / 生成器上下文切换 |
 | **startup** | empty | 引擎冷启动时间 |
 

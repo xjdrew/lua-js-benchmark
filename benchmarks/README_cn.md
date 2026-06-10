@@ -2,7 +2,7 @@
 
 [English](README.md)
 
-本目录包含 7 个分类、共 20 个基准测试用例。每个用例同时有 Lua 和 JavaScript 两个实现，对相同输入产生**完全一致的输出**，确保公平对比。
+本目录包含 7 个分类、共 23 个基准测试用例。每个用例同时有 Lua 和 JavaScript 两个实现，对相同输入产生**完全一致的输出**，确保公平对比。
 
 ## 目录结构
 
@@ -40,6 +40,7 @@ Runner 以 `lua/` 目录为准自动发现测试用例，通过分类映射（`t
 | spectral_norm | [Benchmarks Game](https://benchmarksgame-team.pages.debian.net/benchmarksgame/) | 谱范数：计算无穷矩阵的最大奇异值 |
 | fannkuch | [Benchmarks Game](https://benchmarksgame-team.pages.debian.net/benchmarksgame/) | Fannkuch-redux：生成排列并计算翻饼次数 |
 | matrix | 原创 | 矩阵乘法（200×200，3 轮）使用表的表实现 |
+| sieve | [Byte Sieve](https://en.wikipedia.org/wiki/Byte_Sieve) (1981) | 埃拉托斯特尼筛法：条件循环 + 步进数组写入 |
 
 ### string — 字符串操作
 
@@ -73,6 +74,8 @@ Runner 以 `lua/` 目录为准自动发现测试用例，通过分类映射（`t
 | fibonacci | 经典 | 朴素递归斐波那契 — 函数调用开销测量 |
 | queens | 经典 | N 皇后问题 — 求 N=13 的所有解 |
 | method_dispatch | 原创 | Metatable/原型方法派发 — 多态 OOP 模式 |
+| tak | [Gabriel Benchmarks](https://en.wikipedia.org/wiki/Gabriel_benchmarks) (1985) | Takeuchi 函数 — 三重递归函数调用压力测试 |
+| closure | 经典 | 闭包创建、upvalue 捕获与修改、函数组合 |
 
 ### coroutine — 协程 / 生成器上下文切换
 

@@ -173,16 +173,17 @@ def generate_markdown(stats, relative, cat_summary, overall, results_dir, system
         lines.append(f"| CPU | {sys_info.get('cpu', '-')} |")
         lines.append(f"| CPU Cores | {sys_info.get('cpu_cores', '-')} |")
         lines.append(f"| Memory | {sys_info.get('memory', '-')} |")
+        lines.append(f"| Compiler | {sys_info.get('compiler', '-')} |")
         lines.append("")
 
     engine_info = system_info.get("engines", {})
     if engine_info:
         lines.append("## Engines")
         lines.append("")
-        lines.append("| Engine | Name | Version |")
-        lines.append("|--------|------|---------|")
+        lines.append("| Engine | Name | Version | Build Flags |")
+        lines.append("|--------|------|---------|-------------|")
         for eid, edata in engine_info.items():
-            lines.append(f"| {eid} | {edata.get('display_name', eid)} | {edata.get('version', '-')} |")
+            lines.append(f"| {eid} | {edata.get('display_name', eid)} | {edata.get('version', '-')} | {edata.get('build_flags', '-')} |")
         lines.append("")
 
     # Overall

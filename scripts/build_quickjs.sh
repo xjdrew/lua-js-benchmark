@@ -23,7 +23,7 @@ log_info "Building QuickJS ..."
 
 cd "$QUICKJS_SRC"
 make clean &>/dev/null || true
-make CONFIG_LTO=y -j"$LJB_NPROC"
+make -j"$LJB_NPROC"
 
 ensure_dir "$QUICKJS_BIN_DIR"
 cp qjs "$QUICKJS_BIN"

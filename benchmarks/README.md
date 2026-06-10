@@ -2,7 +2,7 @@
 
 [中文版](README_cn.md)
 
-This directory contains 20 benchmark cases across 7 categories. Each benchmark has both a Lua and a JavaScript implementation that produce **identical output** for the same input, ensuring a fair comparison.
+This directory contains 23 benchmark cases across 7 categories. Each benchmark has both a Lua and a JavaScript implementation that produce **identical output** for the same input, ensuring a fair comparison.
 
 ## Directory Structure
 
@@ -40,6 +40,7 @@ The Lua directory is the canonical source for benchmark discovery. The runner sc
 | spectral_norm | [Benchmarks Game](https://benchmarksgame-team.pages.debian.net/benchmarksgame/) | Spectral norm: compute the largest singular value of an infinite matrix |
 | fannkuch | [Benchmarks Game](https://benchmarksgame-team.pages.debian.net/benchmarksgame/) | Fannkuch-redux: generate permutations and count pancake flips |
 | matrix | Original | Matrix multiplication (200×200, 3 rounds) using table-of-tables |
+| sieve | [Byte Sieve](https://en.wikipedia.org/wiki/Byte_Sieve) (1981) | Sieve of Eratosthenes: conditional loops with stride-based array writes |
 
 ### string — String operations
 
@@ -73,6 +74,8 @@ The Lua directory is the canonical source for benchmark discovery. The runner sc
 | fibonacci | Classic | Naive recursive Fibonacci — function call overhead measurement |
 | queens | Classic | N-queens problem — count all solutions for N=13 |
 | method_dispatch | Original | Metatable/prototype method dispatch — polymorphic OOP patterns |
+| tak | [Gabriel Benchmarks](https://en.wikipedia.org/wiki/Gabriel_benchmarks) (1985) | Takeuchi function — triple-recursive function call stress test |
+| closure | Classic | Closure creation, upvalue capture/mutation, function composition |
 
 ### coroutine — Coroutine / generator context switching
 

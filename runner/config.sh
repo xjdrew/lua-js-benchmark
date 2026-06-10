@@ -34,8 +34,8 @@ ENGINE_ARGS[lua]=""
 ENGINE_ARGS[lua55]=""
 ENGINE_ARGS[luajit]=""
 ENGINE_ARGS[quickjs]="--stack-size 33554432"
-ENGINE_ARGS[v8]=""
-ENGINE_ARGS[v8-nojit]="--jitless"
+ENGINE_ARGS[v8]="--stack-size=65536"
+ENGINE_ARGS[v8-nojit]="--jitless --stack-size=65536"
 
 declare -A ENGINE_DISPLAY_NAME
 ENGINE_DISPLAY_NAME[lua]="Lua 5.4"
@@ -55,6 +55,18 @@ get_engine_version() {
         quickjs)     "$bin" --help 2>&1 | head -1 || true ;;
         v8|v8-nojit) "$bin" --version 2>&1 | head -1 || true ;;
         *)           echo "unknown" ;;
+    esac
+}
+
+get_engine_build_flags() {
+    local engine="$1"
+    case "$engine" in
+        lua)     echo "-O2" ;;
+        lua55)   echo "-O2" ;;
+        luajit)  echo "-O2 -fomit-frame-pointer" ;;
+        quickjs) echo "-O2" ;;
+        v8|v8-nojit) echo "-O2 (release)" ;;
+        *)       echo "unknown" ;;
     esac
 }
 

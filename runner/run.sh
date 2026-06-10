@@ -12,11 +12,12 @@ collect_system_info() {
     local info_file="$RUN_DIR/system_info.txt"
     local json_file="$RUN_DIR/system_info.json"
 
-    local sys_os sys_kernel sys_arch sys_cpu sys_cores sys_memory sys_date
+    local sys_os sys_kernel sys_arch sys_cpu sys_cores sys_memory sys_date sys_cc
     sys_os="$(uname -s)"
     sys_kernel="$(uname -r)"
     sys_arch="$(uname -m)"
     sys_date="$(date -u '+%Y-%m-%d %H:%M:%S UTC')"
+    sys_cc="$(cc --version 2>/dev/null | head -1 || echo unknown)"
 
     if [[ "$sys_os" == "Linux" ]]; then
         sys_cpu="$(grep 'model name' /proc/cpuinfo | head -1 | cut -d: -f2 | xargs)"
@@ -41,10 +42,12 @@ collect_system_info() {
         echo "CPU: $sys_cpu"
         echo "CPU Cores: $sys_cores"
         echo "Memory: $sys_memory"
+        echo "Compiler: $sys_cc"
         echo ""
         echo "=== Engine Versions ==="
         for engine in $(get_available_engines); do
             echo "$engine: $(get_engine_version "$engine")"
+            echo "  build flags: $(get_engine_build_flags "$engine")"
         done
         echo ""
         echo "=== Benchmark Config ==="
@@ -56,10 +59,11 @@ collect_system_info() {
 
     local engines_json=""
     for engine in $(get_available_engines); do
-        local version display_name
+        local version display_name build_flags
         version="$(get_engine_version "$engine")"
         display_name="${ENGINE_DISPLAY_NAME[$engine]:-$engine}"
-        engines_json="$engines_json|$engine|$display_name|$version"
+        build_flags="$(get_engine_build_flags "$engine")"
+        engines_json="$engines_json|$engine|$display_name|$version|$build_flags"
     done
 
     python3 -c "
@@ -72,25 +76,26 @@ system = {
     'cpu': sys.argv[5],
     'cpu_cores': int(sys.argv[6]),
     'memory': sys.argv[7],
+    'compiler': sys.argv[8],
 }
 config = {
-    'runs': int(sys.argv[8]),
-    'warmup': int(sys.argv[9]),
-    'category': sys.argv[10],
+    'runs': int(sys.argv[9]),
+    'warmup': int(sys.argv[10]),
+    'category': sys.argv[11],
 }
 engines = {}
-raw = sys.argv[11]
+raw = sys.argv[12]
 if raw:
     parts = raw.split('|')[1:]
     i = 0
-    while i + 2 < len(parts):
-        eid, dname, ver = parts[i], parts[i+1], parts[i+2]
-        engines[eid] = {'display_name': dname, 'version': ver}
-        i += 3
+    while i + 3 < len(parts):
+        eid, dname, ver, bflags = parts[i], parts[i+1], parts[i+2], parts[i+3]
+        engines[eid] = {'display_name': dname, 'version': ver, 'build_flags': bflags}
+        i += 4
 data = {'system': system, 'engines': engines, 'config': config}
 print(json.dumps(data, indent=2))
 " "$sys_date" "$sys_os" "$sys_kernel" "$sys_arch" "$sys_cpu" "$sys_cores" "$sys_memory" \
-  "$RUNS" "$WARMUP" "${CATEGORY:-all}" "$engines_json" > "$json_file"
+  "$sys_cc" "$RUNS" "$WARMUP" "${CATEGORY:-all}" "$engines_json" > "$json_file"
 
     echo "[INFO]  System info saved to $info_file"
     echo "[INFO]  System info JSON saved to $json_file"
