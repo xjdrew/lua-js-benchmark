@@ -5,7 +5,9 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/common.sh"
 
 LUA_VERSION="${LUA_VERSION:-5.4.7}"
+LUA55_VERSION="${LUA55_VERSION:-5.5.0}"
 LUA_URL="https://www.lua.org/ftp/lua-${LUA_VERSION}.tar.gz"
+LUA55_URL="https://www.lua.org/ftp/lua-${LUA55_VERSION}.tar.gz"
 LUAJIT_REPO="https://github.com/LuaJIT/LuaJIT.git"
 QUICKJS_REPO="https://github.com/bellard/quickjs.git"
 
@@ -36,6 +38,33 @@ download_lua() {
         log_ok "Lua $LUA_VERSION source ready at $dest"
     else
         log_error "Lua source extraction failed"
+        return 1
+    fi
+}
+
+download_lua55() {
+    local dest="$SRC_DIR/lua-${LUA55_VERSION}"
+    if [[ -d "$dest" && -f "$dest/Makefile" ]]; then
+        log_info "Lua $LUA55_VERSION source already exists, skipping."
+        return 0
+    fi
+
+    log_info "Downloading Lua $LUA55_VERSION ..."
+    local tarball="$SRC_DIR/lua-${LUA55_VERSION}.tar.gz"
+
+    if command -v curl &>/dev/null; then
+        curl -fSL --retry 3 -o "$tarball" "$LUA55_URL"
+    else
+        wget -q -O "$tarball" "$LUA55_URL"
+    fi
+
+    tar xzf "$tarball" -C "$SRC_DIR"
+    rm -f "$tarball"
+
+    if [[ -d "$dest" && -f "$dest/Makefile" ]]; then
+        log_ok "Lua $LUA55_VERSION source ready at $dest"
+    else
+        log_error "Lua 5.5 source extraction failed"
         return 1
     fi
 }
@@ -105,6 +134,10 @@ echo ""
 
 if engine_enabled lua; then
     download_lua || FAILED+=("lua")
+fi
+
+if engine_enabled lua55; then
+    download_lua55 || FAILED+=("lua55")
 fi
 
 if engine_enabled luajit; then

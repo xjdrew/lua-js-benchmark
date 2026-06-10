@@ -11,6 +11,7 @@ Automated performance comparison of Lua and JavaScript engines. Build from sourc
 | Engine | Language | Description |
 |--------|----------|-------------|
 | **Lua 5.4** | Lua | Official PUC-Rio interpreter (baseline for all comparisons) |
+| Lua 5.5 | Lua | Latest PUC-Rio interpreter |
 | LuaJIT 2.1 | Lua | High-performance JIT-compiled Lua |
 | QuickJS | JavaScript | Lightweight embeddable JS engine (Fabrice Bellard) |
 | V8 (JIT) | JavaScript | Chrome's JS engine with JIT compilation |

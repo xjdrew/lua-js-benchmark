@@ -5,7 +5,7 @@ ROOT_DIR="${ROOT_DIR:-$(cd "$SCRIPT_DIR/.." && pwd)}"
 BUILD_DIR="${BUILD_DIR:-$ROOT_DIR/.build}"
 SRC_DIR="${SRC_DIR:-$BUILD_DIR/src}"
 ENGINES_DIR="${ENGINES_DIR:-$BUILD_DIR/engines}"
-ENGINES="${ENGINES:-lua luajit quickjs v8}"
+ENGINES="${ENGINES:-lua lua55 luajit quickjs v8}"
 
 source "$SCRIPT_DIR/detect_platform.sh"
 

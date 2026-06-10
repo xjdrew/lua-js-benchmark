@@ -11,6 +11,7 @@
 | 引擎 | 语言 | 说明 |
 |------|------|------|
 | **Lua 5.4** | Lua | PUC-Rio 官方解释器（所有对比的基准线） |
+| Lua 5.5 | Lua | PUC-Rio 最新版解释器 |
 | LuaJIT 2.1 | Lua | 高性能 JIT 编译的 Lua |
 | QuickJS | JavaScript | 轻量级可嵌入 JS 引擎（Fabrice Bellard） |
 | V8 (JIT) | JavaScript | Chrome 的 JS 引擎，开启 JIT |

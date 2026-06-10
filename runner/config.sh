@@ -7,7 +7,7 @@ ENGINES_DIR="${ENGINES_DIR:-$BUILD_DIR/engines}"
 
 RUNS="${RUNS:-5}"
 WARMUP="${WARMUP:-2}"
-ENGINES="${ENGINES:-lua luajit quickjs v8}"
+ENGINES="${ENGINES:-lua lua55 luajit quickjs v8}"
 CATEGORY="${CATEGORY:-}"
 
 BENCHMARKS_DIR="$ROOT_DIR/benchmarks"
@@ -15,6 +15,7 @@ RESULTS_DIR="$ROOT_DIR/results"
 
 declare -A ENGINE_BIN
 ENGINE_BIN[lua]="$ENGINES_DIR/lua/bin/lua"
+ENGINE_BIN[lua55]="$ENGINES_DIR/lua55/bin/lua"
 ENGINE_BIN[luajit]="$ENGINES_DIR/luajit/bin/luajit"
 ENGINE_BIN[quickjs]="$ENGINES_DIR/quickjs/bin/qjs"
 ENGINE_BIN[v8]="$ENGINES_DIR/v8/bin/d8"
@@ -22,6 +23,7 @@ ENGINE_BIN[v8-nojit]="$ENGINES_DIR/v8/bin/d8"
 
 declare -A ENGINE_LANG
 ENGINE_LANG[lua]="lua"
+ENGINE_LANG[lua55]="lua"
 ENGINE_LANG[luajit]="lua"
 ENGINE_LANG[quickjs]="js"
 ENGINE_LANG[v8]="js"
@@ -29,6 +31,7 @@ ENGINE_LANG[v8-nojit]="js"
 
 declare -A ENGINE_ARGS
 ENGINE_ARGS[lua]=""
+ENGINE_ARGS[lua55]=""
 ENGINE_ARGS[luajit]=""
 ENGINE_ARGS[quickjs]="--stack-size 33554432"
 ENGINE_ARGS[v8]=""
@@ -36,6 +39,7 @@ ENGINE_ARGS[v8-nojit]="--jitless"
 
 declare -A ENGINE_DISPLAY_NAME
 ENGINE_DISPLAY_NAME[lua]="Lua 5.4"
+ENGINE_DISPLAY_NAME[lua55]="Lua 5.5"
 ENGINE_DISPLAY_NAME[luajit]="LuaJIT 2.1"
 ENGINE_DISPLAY_NAME[quickjs]="QuickJS"
 ENGINE_DISPLAY_NAME[v8]="V8 (JIT)"
@@ -46,7 +50,7 @@ get_engine_version() {
     local bin="${ENGINE_BIN[$engine]}"
     [[ -x "$bin" ]] || { echo "unknown"; return; }
     case "$engine" in
-        lua)         "$bin" -v 2>&1 | head -1 || true ;;
+        lua|lua55)   "$bin" -v 2>&1 | head -1 || true ;;
         luajit)      "$bin" -v 2>&1 | head -1 || true ;;
         quickjs)     "$bin" --help 2>&1 | head -1 || true ;;
         v8|v8-nojit) "$bin" --version 2>&1 | head -1 || true ;;
