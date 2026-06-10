@@ -53,19 +53,20 @@ parse_time_linux() {
 parse_time_darwin() {
     local wall_ms user_ms sys_ms peak_rss
 
-    local real_line
-    real_line=$(grep "real " "$TIME_FILE" | head -1)
-    wall_ms=$(echo "$real_line" | awk '{printf "%.2f", $1 * 1000}')
+    local time_line
+    time_line=$(grep "real" "$TIME_FILE" | head -1 || true)
+    if [[ -n "$time_line" ]]; then
+        wall_ms=$(echo "$time_line" | awk '{printf "%.2f", $1 * 1000}')
+        user_ms=$(echo "$time_line" | awk '{printf "%.2f", $3 * 1000}')
+        sys_ms=$(echo "$time_line" | awk '{printf "%.2f", $5 * 1000}')
+    else
+        wall_ms="0.00"
+        user_ms="0.00"
+        sys_ms="0.00"
+    fi
 
-    local user_line
-    user_line=$(grep "user " "$TIME_FILE" | head -1)
-    user_ms=$(echo "$user_line" | awk '{printf "%.2f", $1 * 1000}')
-
-    local sys_line
-    sys_line=$(grep "sys " "$TIME_FILE" | head -1)
-    sys_ms=$(echo "$sys_line" | awk '{printf "%.2f", $1 * 1000}')
-
-    peak_rss=$(grep "maximum resident" "$TIME_FILE" | awk '{print int($1 / 1024)}')
+    peak_rss=$(grep "maximum resident" "$TIME_FILE" | awk '{print int($1 / 1024)}' || true)
+    peak_rss="${peak_rss:-0}"
 
     echo "${wall_ms},${user_ms},${sys_ms},${peak_rss}"
 }
