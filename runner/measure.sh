@@ -17,9 +17,9 @@ run_with_time() {
             "$ENGINE_BIN" $ENGINE_ARGS "$SCRIPT" $SCRIPT_ARGS \
             > "$OUTPUT_FILE" 2>&1
     elif [[ "$OS" == "Darwin" ]]; then
-        /usr/bin/time -l -o "$TIME_FILE" \
+        /usr/bin/time -l \
             "$ENGINE_BIN" $ENGINE_ARGS "$SCRIPT" $SCRIPT_ARGS \
-            > "$OUTPUT_FILE" 2>&1
+            > "$OUTPUT_FILE" 2>"$TIME_FILE"
     else
         echo "Unsupported OS: $OS" >&2
         exit 1
