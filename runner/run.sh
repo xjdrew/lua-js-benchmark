@@ -211,4 +211,6 @@ echo "=== Summary ==="
 echo "Total runs: $TOTAL (failed: $FAILED)"
 echo "Results: $CSV_FILE"
 echo ""
+
+ln -sfn "$TIMESTAMP" "$RESULTS_DIR/latest"
 echo "To generate report: make report"

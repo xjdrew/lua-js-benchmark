@@ -24,9 +24,21 @@ def load_system_info(results_dir):
 
 
 def find_latest_results():
+    if len(sys.argv) > 1:
+        p = Path(sys.argv[1])
+        if p.exists():
+            return p.resolve()
+        print(f"[ERROR] Specified results path not found: {p}")
+        sys.exit(1)
+
     if not RESULTS_DIR.exists():
         print("[ERROR] No results directory found. Run 'make bench' first.")
         sys.exit(1)
+
+    latest = RESULTS_DIR / "latest"
+    if latest.is_symlink() or latest.is_dir():
+        return latest.resolve()
+
     dirs = sorted([d for d in RESULTS_DIR.iterdir() if d.is_dir()])
     if not dirs:
         print("[ERROR] No results found. Run 'make bench' first.")

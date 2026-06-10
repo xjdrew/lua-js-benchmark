@@ -9,6 +9,7 @@ ENGINES ?= lua luajit quickjs v8
 CATEGORY ?=
 RUNS ?= 5
 WARMUP ?= 2
+RESULTS_PATH ?=
 
 export ROOT_DIR SCRIPTS_DIR BUILD_DIR ENGINES_DIR SRC_DIR ENGINES CATEGORY RUNS WARMUP
 
@@ -25,7 +26,11 @@ bench:
 	@bash $(ROOT_DIR)/runner/run.sh
 
 report:
+ifdef RESULTS_PATH
+	@python3 $(ROOT_DIR)/report/generate.py $(RESULTS_PATH)
+else
 	@python3 $(ROOT_DIR)/report/generate.py
+endif
 
 # --- Download targets (individual retry) ---
 

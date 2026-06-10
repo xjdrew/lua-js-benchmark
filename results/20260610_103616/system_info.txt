@@ -1,0 +1,21 @@
+=== System Information ===
+Date: 2026-06-10 02:36:16 UTC
+OS: Linux
+Kernel: 6.6.87.2-microsoft-standard-WSL2
+Architecture: x86_64
+CPU: Intel(R) Core(TM) Ultra 7 255HX
+CPU Cores: 20
+Memory: 15Gi
+
+=== Engine Versions ===
+lua: Lua 5.4.7  Copyright (C) 1994-2024 Lua.org, PUC-Rio
+luajit: LuaJIT 2.1.1780076327 -- Copyright (C) 2005-2026 Mike Pall. https://luajit.org/
+quickjs: QuickJS version 2026-06-04
+v8: V8 version 15.1.0 (candidate)
+v8-nojit: V8 version 15.1.0 (candidate)
+
+=== Benchmark Config ===
+RUNS: 5
+WARMUP: 2
+ENGINES: lua luajit quickjs v8
+CATEGORY: all
