@@ -112,7 +112,7 @@ local function advance(dt)
 end
 
 local N = tonumber(arg and arg[1]) or 500000
-collectgarbage("collect")
+-- collectgarbage("collect")
 
 offset_momentum()
 io.write(string.format("%.9f\n", energy()))

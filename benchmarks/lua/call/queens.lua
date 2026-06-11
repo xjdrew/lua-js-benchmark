@@ -2,7 +2,7 @@
 -- Count all solutions to the N-queens problem
 
 local N = tonumber(arg and arg[1]) or 13
-collectgarbage("collect")
+-- collectgarbage("collect")
 
 local count = 0
 local cols = {}

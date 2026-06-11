@@ -5,7 +5,7 @@
 
 local N = tonumber(arg and arg[1]) or 1500
 local MAX_ITER = 50
-collectgarbage("collect")
+-- collectgarbage("collect")
 
 local count = 0
 

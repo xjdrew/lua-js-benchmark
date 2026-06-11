@@ -3,7 +3,7 @@
 -- Classic funarg patterns from 1970s onward, common in production callback code
 
 local N = tonumber(arg and arg[1]) or 10000000
-collectgarbage("collect")
+-- collectgarbage("collect")
 
 local function make_adder(k)
     return function(x) return x + k end

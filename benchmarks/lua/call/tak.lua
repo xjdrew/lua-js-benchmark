@@ -3,7 +3,7 @@
 -- Tests deeply recursive triple-branching function calls
 
 local N = tonumber(arg and arg[1]) or 10
-collectgarbage("collect")
+-- collectgarbage("collect")
 
 local function tak(x, y, z)
     if y >= x then return z end

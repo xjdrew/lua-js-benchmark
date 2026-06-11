@@ -3,7 +3,7 @@
 -- Fannkuch-redux benchmark
 
 local N = tonumber(arg and arg[1]) or 10
-collectgarbage("collect")
+-- collectgarbage("collect")
 
 local perm = {}
 local perm1 = {}

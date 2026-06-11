@@ -3,7 +3,7 @@
 -- Tests conditional loops with stride-based array writes
 
 local N = tonumber(arg and arg[1]) or 2000000
-collectgarbage("collect")
+-- collectgarbage("collect")
 
 local R = 10
 local count

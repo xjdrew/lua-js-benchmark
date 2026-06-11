@@ -3,7 +3,7 @@
 -- Representative of config/data processing patterns
 
 local N = tonumber(arg and arg[1]) or 500000
-collectgarbage("collect")
+-- collectgarbage("collect")
 
 -- Phase 1: Insert key-value pairs with string keys
 local data = {}

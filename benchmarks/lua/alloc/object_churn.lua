@@ -2,7 +2,7 @@
 -- Create N small tables with 3 fields and sum all values
 
 local N = tonumber(arg and arg[1]) or 10000000
-collectgarbage("collect")
+-- collectgarbage("collect")
 
 local sum = 0
 for i = 0, N - 1 do

@@ -2,7 +2,7 @@
 -- Uses linear congruential generator
 
 local N = tonumber(arg and arg[1]) or 5000000
-collectgarbage("collect")
+-- collectgarbage("collect")
 
 local IM = 139968
 local IA = 3877

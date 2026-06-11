@@ -3,7 +3,7 @@
 -- Lua 5.5's incremental major GC should excel here
 
 local N = tonumber(arg and arg[1]) or 2000000
-collectgarbage("collect")
+-- collectgarbage("collect")
 
 -- Long-lived data structure (survives entire benchmark)
 local registry = {}

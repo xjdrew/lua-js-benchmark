@@ -3,7 +3,7 @@
 -- Binary trees benchmark
 
 local N = tonumber(arg and arg[1]) or 15
-collectgarbage("collect")
+-- collectgarbage("collect")
 
 local function make(depth)
     if depth == 0 then

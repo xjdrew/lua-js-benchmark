@@ -3,7 +3,7 @@
 -- Tests nested table access + numerical computation
 
 local N = tonumber(arg and arg[1]) or 200
-collectgarbage("collect")
+-- collectgarbage("collect")
 
 local function make_matrix(rows, cols, init_fn)
     local m = {}

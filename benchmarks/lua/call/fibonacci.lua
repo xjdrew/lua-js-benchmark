@@ -1,7 +1,7 @@
 -- Naive recursive Fibonacci benchmark
 
 local N = tonumber(arg and arg[1]) or 38
-collectgarbage("collect")
+-- collectgarbage("collect")
 
 local function fib(n)
     if n < 2 then

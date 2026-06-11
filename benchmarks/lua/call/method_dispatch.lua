@@ -3,7 +3,7 @@
 -- Representative of production Lua patterns (OpenResty, game scripting)
 
 local N = tonumber(arg and arg[1]) or 5000000
-collectgarbage("collect")
+-- collectgarbage("collect")
 
 -- Base class via metatables
 local Animal = {}

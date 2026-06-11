@@ -74,7 +74,7 @@ declare -A CATEGORY_DIR_JS
 CATEGORY_DIR_JS[compute]="compute"
 CATEGORY_DIR_JS[string]="string"
 CATEGORY_DIR_JS[alloc]="alloc"
-CATEGORY_DIR_JS[table]="object"
+CATEGORY_DIR_JS[table]="table"
 CATEGORY_DIR_JS[call]="call"
 CATEGORY_DIR_JS[coroutine]="async"
 CATEGORY_DIR_JS[startup]="startup"
