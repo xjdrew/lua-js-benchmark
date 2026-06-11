@@ -27,7 +27,7 @@ if min_depth + 2 > max_depth then
 end
 
 local stretch_depth = max_depth + 1
-io.write(string.format("stretch tree of depth %d\t check: %d\n",
+print(string.format("stretch tree of depth %d\t check: %d",
     stretch_depth, check(make(stretch_depth))))
 
 local long_lived = make(max_depth)
@@ -38,9 +38,9 @@ for depth = min_depth, max_depth, 2 do
     for i = 1, iterations do
         sum = sum + check(make(depth))
     end
-    io.write(string.format("%d\t trees of depth %d\t check: %d\n",
+    print(string.format("%d\t trees of depth %d\t check: %d",
         iterations, depth, sum))
 end
 
-io.write(string.format("long lived tree of depth %d\t check: %d\n",
+print(string.format("long lived tree of depth %d\t check: %d",
     max_depth, check(long_lived)))

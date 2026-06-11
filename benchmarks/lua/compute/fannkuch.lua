@@ -87,4 +87,5 @@ while true do
     end
 end
 
-io.write(string.format("%d\nPfannkuchen(%d) = %d\n", checksum, N, maxflips))
+print(checksum)
+print(string.format("Pfannkuchen(%d) = %d", N, maxflips))

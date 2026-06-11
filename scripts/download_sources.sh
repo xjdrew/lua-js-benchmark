@@ -10,6 +10,7 @@ LUA_URL="https://www.lua.org/ftp/lua-${LUA_VERSION}.tar.gz"
 LUA55_URL="https://www.lua.org/ftp/lua-${LUA55_VERSION}.tar.gz"
 LUAJIT_REPO="https://github.com/LuaJIT/LuaJIT.git"
 QUICKJS_REPO="https://github.com/bellard/quickjs.git"
+LUAU_REPO="https://github.com/luau-lang/luau.git"
 
 ensure_dir "$SRC_DIR"
 
@@ -95,6 +96,19 @@ download_quickjs() {
     log_ok "QuickJS source ready at $dest"
 }
 
+download_luau() {
+    local dest="$SRC_DIR/luau"
+    if [[ -d "$dest" && -f "$dest/CMakeLists.txt" ]]; then
+        log_info "Luau source already exists, skipping."
+        return 0
+    fi
+
+    log_info "Cloning Luau ..."
+    rm -rf "$dest"
+    git clone --depth 1 "$LUAU_REPO" "$dest"
+    log_ok "Luau source ready at $dest"
+}
+
 download_v8() {
     local depot_tools_dir="$SRC_DIR/depot_tools"
     local v8_dir="$SRC_DIR/v8"
@@ -146,6 +160,10 @@ fi
 
 if engine_enabled quickjs; then
     download_quickjs || FAILED+=("quickjs")
+fi
+
+if engine_enabled luau; then
+    download_luau || FAILED+=("luau")
 fi
 
 if engine_enabled v8; then

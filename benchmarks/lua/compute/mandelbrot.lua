@@ -31,4 +31,4 @@ for y = 0, N - 1 do
     end
 end
 
-io.write(string.format("%d\n", count))
+print(count)

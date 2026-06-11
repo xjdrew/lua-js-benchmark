@@ -7,7 +7,7 @@ ENGINES_DIR="${ENGINES_DIR:-$BUILD_DIR/engines}"
 
 RUNS="${RUNS:-5}"
 WARMUP="${WARMUP:-2}"
-ENGINES="${ENGINES:-lua lua55 luajit quickjs v8}"
+ENGINES="${ENGINES:-lua lua55 luajit luau quickjs v8}"
 CATEGORY="${CATEGORY:-}"
 
 BENCHMARKS_DIR="$ROOT_DIR/benchmarks"
@@ -17,6 +17,8 @@ declare -A ENGINE_BIN
 ENGINE_BIN[lua]="$ENGINES_DIR/lua/bin/lua"
 ENGINE_BIN[lua55]="$ENGINES_DIR/lua55/bin/lua"
 ENGINE_BIN[luajit]="$ENGINES_DIR/luajit/bin/luajit"
+ENGINE_BIN[luau]="$ENGINES_DIR/luau/bin/luau"
+ENGINE_BIN[luau-codegen]="$ENGINES_DIR/luau/bin/luau"
 ENGINE_BIN[quickjs]="$ENGINES_DIR/quickjs/bin/qjs"
 ENGINE_BIN[v8]="$ENGINES_DIR/v8/bin/d8"
 ENGINE_BIN[v8-nojit]="$ENGINES_DIR/v8/bin/d8"
@@ -25,6 +27,8 @@ declare -A ENGINE_LANG
 ENGINE_LANG[lua]="lua"
 ENGINE_LANG[lua55]="lua"
 ENGINE_LANG[luajit]="lua"
+ENGINE_LANG[luau]="lua"
+ENGINE_LANG[luau-codegen]="lua"
 ENGINE_LANG[quickjs]="js"
 ENGINE_LANG[v8]="js"
 ENGINE_LANG[v8-nojit]="js"
@@ -33,6 +37,8 @@ declare -A ENGINE_ARGS
 ENGINE_ARGS[lua]=""
 ENGINE_ARGS[lua55]=""
 ENGINE_ARGS[luajit]=""
+ENGINE_ARGS[luau]=""
+ENGINE_ARGS[luau-codegen]="--codegen"
 ENGINE_ARGS[quickjs]="--stack-size 33554432"
 ENGINE_ARGS[v8]="--stack-size=65536"
 ENGINE_ARGS[v8-nojit]="--jitless --stack-size=65536"
@@ -41,6 +47,8 @@ declare -A ENGINE_DISPLAY_NAME
 ENGINE_DISPLAY_NAME[lua]="Lua 5.4"
 ENGINE_DISPLAY_NAME[lua55]="Lua 5.5"
 ENGINE_DISPLAY_NAME[luajit]="LuaJIT 2.1"
+ENGINE_DISPLAY_NAME[luau]="Luau"
+ENGINE_DISPLAY_NAME[luau-codegen]="Luau (codegen)"
 ENGINE_DISPLAY_NAME[quickjs]="QuickJS"
 ENGINE_DISPLAY_NAME[v8]="V8 (JIT)"
 ENGINE_DISPLAY_NAME[v8-nojit]="V8 (no-JIT)"
@@ -52,6 +60,7 @@ get_engine_version() {
     case "$engine" in
         lua|lua55)   "$bin" -v 2>&1 | head -1 || true ;;
         luajit)      "$bin" -v 2>&1 | head -1 || true ;;
+        luau|luau-codegen) echo 'print(_VERSION)' | "$bin" 2>/dev/null || echo "Luau" ;;
         quickjs)     "$bin" --help 2>&1 | head -1 || true ;;
         v8|v8-nojit) "$bin" --version 2>&1 | head -1 || true ;;
         *)           echo "unknown" ;;
@@ -64,6 +73,8 @@ get_engine_build_flags() {
         lua)     echo "-O2" ;;
         lua55)   echo "-O2" ;;
         luajit)  echo "-O2 -fomit-frame-pointer" ;;
+        luau)    echo "-O2 (Release)" ;;
+        luau-codegen) echo "-O2 (Release, native codegen)" ;;
         quickjs) echo "-O2" ;;
         v8|v8-nojit) echo "-O2 (release)" ;;
         *)       echo "unknown" ;;
@@ -84,6 +95,8 @@ expand_engines() {
     for e in $ENGINES; do
         if [[ "$e" == "v8" ]]; then
             result="$result v8 v8-nojit"
+        elif [[ "$e" == "luau" ]]; then
+            result="$result luau luau-codegen"
         else
             result="$result $e"
         fi

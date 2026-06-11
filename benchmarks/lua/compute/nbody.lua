@@ -115,10 +115,10 @@ local N = tonumber(arg and arg[1]) or 500000
 -- collectgarbage("collect")
 
 offset_momentum()
-io.write(string.format("%.9f\n", energy()))
+print(string.format("%.9f", energy()))
 
 for _ = 1, N do
     advance(0.01)
 end
 
-io.write(string.format("%.9f\n", energy()))
+print(string.format("%.9f", energy()))

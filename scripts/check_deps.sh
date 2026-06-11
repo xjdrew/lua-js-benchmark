@@ -62,11 +62,19 @@ if [[ "$LJB_OS" == "linux" ]]; then
 fi
 
 needs_v8=no
+needs_luau=no
 for e in $ENGINES; do
     if [[ "$e" == "v8" ]]; then
         needs_v8=yes
     fi
+    if [[ "$e" == "luau" ]]; then
+        needs_luau=yes
+    fi
 done
+
+if [[ "$needs_luau" == "yes" ]]; then
+    check_cmd cmake "Build tool (required for Luau)" || true
+fi
 
 if [[ "$needs_v8" == "yes" ]]; then
     check_cmd ninja "Build tool (required for V8)" no || true

@@ -66,4 +66,4 @@ for i = 0, N - 1 do
     vv  = vv  + v[i] * v[i]
 end
 
-io.write(string.format("%.9f\n", sqrt(vBv / vv)))
+print(string.format("%.9f", sqrt(vBv / vv)))

@@ -10,4 +10,4 @@ for i = 0, N - 1 do
     sum = sum + obj.x + obj.y + obj.z
 end
 
-io.write(string.format("%d\n", sum))
+print(string.format("%d", sum))
