@@ -1,21 +1,29 @@
 === System Information ===
-Date: 2026-06-10 02:36:16 UTC
+Date: 2026-06-11 06:48:01 UTC
 OS: Linux
 Kernel: 6.6.87.2-microsoft-standard-WSL2
 Architecture: x86_64
 CPU: Intel(R) Core(TM) Ultra 7 255HX
 CPU Cores: 20
 Memory: 15Gi
+Compiler: cc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0
 
 === Engine Versions ===
 lua: Lua 5.4.7  Copyright (C) 1994-2024 Lua.org, PUC-Rio
+  build flags: -O2
+lua55: Lua 5.5.0  Copyright (C) 1994-2025 Lua.org, PUC-Rio
+  build flags: -O2
 luajit: LuaJIT 2.1.1780076327 -- Copyright (C) 2005-2026 Mike Pall. https://luajit.org/
+  build flags: -O2 -fomit-frame-pointer
 quickjs: QuickJS version 2026-06-04
+  build flags: -O2
 v8: V8 version 15.1.0 (candidate)
+  build flags: -O2 (release)
 v8-nojit: V8 version 15.1.0 (candidate)
+  build flags: -O2 (release)
 
 === Benchmark Config ===
 RUNS: 5
 WARMUP: 2
-ENGINES: lua luajit quickjs v8
+ENGINES: lua lua55 luajit quickjs v8
 CATEGORY: all

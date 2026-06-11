@@ -92,6 +92,7 @@ const DATA = {
   "baseline": "lua",
   "engines": [
     "lua",
+    "lua55",
     "luajit",
     "quickjs",
     "v8",
@@ -107,34 +108,45 @@ const DATA = {
   ],
   "system_info": {
     "system": {
-      "date": "2026-06-10 02:36:16 UTC",
+      "date": "2026-06-11 06:48:01 UTC",
       "os": "Linux",
       "kernel": "6.6.87.2-microsoft-standard-WSL2",
       "arch": "x86_64",
       "cpu": "Intel(R) Core(TM) Ultra 7 255HX",
       "cpu_cores": 20,
-      "memory": "15Gi"
+      "memory": "15Gi",
+      "compiler": "cc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0"
     },
     "engines": {
       "lua": {
         "display_name": "Lua 5.4",
-        "version": "Lua 5.4.7  Copyright (C) 1994-2024 Lua.org, PUC-Rio"
+        "version": "Lua 5.4.7  Copyright (C) 1994-2024 Lua.org, PUC-Rio",
+        "build_flags": "-O2"
+      },
+      "lua55": {
+        "display_name": "Lua 5.5",
+        "version": "Lua 5.5.0  Copyright (C) 1994-2025 Lua.org, PUC-Rio",
+        "build_flags": "-O2"
       },
       "luajit": {
         "display_name": "LuaJIT 2.1",
-        "version": "LuaJIT 2.1.1780076327 -- Copyright (C) 2005-2026 Mike Pall. https://luajit.org/"
+        "version": "LuaJIT 2.1.1780076327 -- Copyright (C) 2005-2026 Mike Pall. https://luajit.org/",
+        "build_flags": "-O2 -fomit-frame-pointer"
       },
       "quickjs": {
         "display_name": "QuickJS",
-        "version": "QuickJS version 2026-06-04"
+        "version": "QuickJS version 2026-06-04",
+        "build_flags": "-O2"
       },
       "v8": {
         "display_name": "V8 (JIT)",
-        "version": "V8 version 15.1.0 (candidate)"
+        "version": "V8 version 15.1.0 (candidate)",
+        "build_flags": "-O2 (release)"
       },
       "v8-nojit": {
         "display_name": "V8 (no-JIT)",
-        "version": "V8 version 15.1.0 (candidate)"
+        "version": "V8 version 15.1.0 (candidate)",
+        "build_flags": "-O2 (release)"
       }
     },
     "config": {
@@ -146,117 +158,137 @@ const DATA = {
   "overall": [
     {
       "engine": "v8",
-      "total_ms": 1460.0,
-      "relative": 0.2358642972536349,
+      "total_ms": 3760.0,
+      "relative": 0.19873150105708245,
       "category_breakdown": {
-        "alloc": 110.0,
-        "call": 200.0,
-        "compute": 340.0,
-        "coroutine": 10.0,
-        "startup": 10.0,
-        "string": 50.0,
-        "table": 740.0
+        "alloc": 370.0,
+        "call": 1410.0,
+        "compute": 600.0,
+        "coroutine": 80.0,
+        "startup": 0.0,
+        "string": 280.0,
+        "table": 1020.0
       }
     },
     {
       "engine": "luajit",
-      "total_ms": 1520.0,
-      "relative": 0.2455573505654281,
+      "total_ms": 4610.0,
+      "relative": 0.24365750528541227,
       "category_breakdown": {
-        "alloc": 360.0,
-        "call": 170.0,
-        "compute": 480.0,
-        "coroutine": 0.0,
+        "alloc": 720.0,
+        "call": 1240.0,
+        "compute": 660.0,
+        "coroutine": 200.0,
         "startup": 0.0,
-        "string": 50.0,
-        "table": 460.0
+        "string": 410.0,
+        "table": 1380.0
+      }
+    },
+    {
+      "engine": "lua55",
+      "total_ms": 17570.0,
+      "relative": 0.928646934460888,
+      "category_breakdown": {
+        "alloc": 2630.0,
+        "call": 5390.0,
+        "compute": 4950.0,
+        "coroutine": 410.0,
+        "startup": 0.0,
+        "string": 1050.0,
+        "table": 3140.0
       }
     },
     {
       "engine": "lua",
-      "total_ms": 6190.0,
+      "total_ms": 18920.0,
       "relative": 1.0,
       "category_breakdown": {
-        "alloc": 700.0,
-        "call": 720.0,
-        "compute": 3490.0,
-        "coroutine": 10.0,
+        "alloc": 2890.0,
+        "call": 5630.0,
+        "compute": 5620.0,
+        "coroutine": 420.0,
         "startup": 0.0,
-        "string": 150.0,
-        "table": 1120.0
+        "string": 1060.0,
+        "table": 3300.0
       }
     },
     {
       "engine": "v8-nojit",
-      "total_ms": 8520.0,
-      "relative": 1.3764135702746365,
+      "total_ms": 22110.0,
+      "relative": 1.1686046511627908,
       "category_breakdown": {
-        "alloc": 500.0,
-        "call": 1070.0,
-        "compute": 5520.0,
-        "coroutine": 20.0,
+        "alloc": 1060.0,
+        "call": 8220.0,
+        "compute": 8980.0,
+        "coroutine": 360.0,
         "startup": 0.0,
-        "string": 220.0,
-        "table": 1190.0
+        "string": 1150.0,
+        "table": 2340.0
       }
     },
     {
       "engine": "quickjs",
-      "total_ms": 8920.0,
-      "relative": 1.4410339256865912,
+      "total_ms": 28470.0,
+      "relative": 1.504756871035941,
       "category_breakdown": {
-        "alloc": 940.0,
-        "call": 1230.0,
-        "compute": 5790.0,
-        "coroutine": 10.0,
+        "alloc": 2120.0,
+        "call": 9240.0,
+        "compute": 11790.0,
+        "coroutine": 500.0,
         "startup": 0.0,
-        "string": 160.0,
-        "table": 790.0
+        "string": 1390.0,
+        "table": 3430.0
       }
     }
   ],
   "category_summary": {
     "alloc": {
       "lua": 1.0,
-      "luajit": 0.2903225806451613,
-      "quickjs": 1.3568548387096775,
-      "v8": 0.25201612903225806,
-      "v8-nojit": 0.8387096774193548
+      "lua55": 0.9153467684296508,
+      "luajit": 0.26795423218296915,
+      "quickjs": 0.9366448846232387,
+      "v8": 0.16964361684024232,
+      "v8-nojit": 0.4806822629501055
     },
     "call": {
       "lua": 1.0,
-      "luajit": 0.2372782446311858,
-      "quickjs": 1.7421802054154996,
-      "v8": 0.2830298786181139,
-      "v8-nojit": 1.4580999066293183
+      "lua55": 0.973544025016164,
+      "luajit": 0.1992733294889545,
+      "quickjs": 1.676438569074111,
+      "v8": 0.24513922565808052,
+      "v8-nojit": 1.4808635994812878
     },
     "compute": {
       "lua": 1.0,
-      "luajit": 0.09879306827614345,
-      "quickjs": 1.8460307369265183,
-      "v8": 0.10653243222330083,
-      "v8-nojit": 1.7863075328155995
+      "lua55": 0.8793078506280313,
+      "luajit": 0.10578941715352962,
+      "quickjs": 2.179821155851167,
+      "v8": 0.10953453030858455,
+      "v8-nojit": 1.6936318783767474
     },
     "coroutine": {
       "lua": 1.0,
-      "luajit": 0.0,
-      "quickjs": 1.0,
-      "v8": 1.0,
-      "v8-nojit": 2.0
+      "lua55": 0.9761904761904762,
+      "luajit": 0.47619047619047616,
+      "quickjs": 1.1904761904761905,
+      "v8": 0.19047619047619047,
+      "v8-nojit": 0.8571428571428571
     },
     "string": {
       "lua": 1.0,
-      "luajit": 0.30000000000000004,
-      "quickjs": 0.8,
-      "v8": 0.25,
-      "v8-nojit": 1.15
+      "lua55": 0.9636148721255104,
+      "luajit": 0.38929722759509994,
+      "quickjs": 1.3983988824414357,
+      "v8": 0.3552009456264775,
+      "v8-nojit": 1.149151085321298
     },
     "table": {
       "lua": 1.0,
-      "luajit": 0.37575757575757573,
-      "quickjs": 1.3146464646464646,
-      "v8": 0.4797979797979798,
-      "v8-nojit": 1.2792929292929294
+      "lua55": 0.9354696913041671,
+      "luajit": 0.40649106042350464,
+      "quickjs": 1.2420862243272812,
+      "v8": 0.2895904829171687,
+      "v8-nojit": 0.8516952650020081
     }
   },
   "benchmarks": [
@@ -264,451 +296,817 @@ const DATA = {
       "name": "alloc/binary_trees",
       "category": "alloc",
       "lua": {
-        "wall_ms": 620.0,
+        "wall_ms": 590.0,
         "relative": 1.0
       },
+      "lua55": {
+        "wall_ms": 580.0,
+        "relative": 0.9830508474576272
+      },
       "luajit": {
-        "wall_ms": 360.0,
-        "relative": 0.5806451612903226
+        "wall_ms": 330.0,
+        "relative": 0.559322033898305
       },
       "quickjs": {
-        "wall_ms": 830.0,
-        "relative": 1.3387096774193548
+        "wall_ms": 700.0,
+        "relative": 1.1864406779661016
       },
       "v8": {
-        "wall_ms": 80.0,
-        "relative": 0.12903225806451613
+        "wall_ms": 130.0,
+        "relative": 0.22033898305084745
       },
       "v8-nojit": {
-        "wall_ms": 420.0,
-        "relative": 0.6774193548387096
+        "wall_ms": 340.0,
+        "relative": 0.576271186440678
+      }
+    },
+    {
+      "name": "alloc/gc_stress",
+      "category": "alloc",
+      "lua": {
+        "wall_ms": 1660.0,
+        "relative": 1.0
+      },
+      "lua55": {
+        "wall_ms": 1500.0,
+        "relative": 0.9036144578313253
+      },
+      "luajit": {
+        "wall_ms": 380.0,
+        "relative": 0.2289156626506024
+      },
+      "quickjs": {
+        "wall_ms": 620.0,
+        "relative": 0.37349397590361444
+      },
+      "v8": {
+        "wall_ms": 90.0,
+        "relative": 0.05421686746987952
+      },
+      "v8-nojit": {
+        "wall_ms": 270.0,
+        "relative": 0.16265060240963855
       }
     },
     {
       "name": "alloc/object_churn",
       "category": "alloc",
       "lua": {
-        "wall_ms": 80.0,
+        "wall_ms": 640.0,
         "relative": 1.0
+      },
+      "lua55": {
+        "wall_ms": 550.0,
+        "relative": 0.859375
       },
       "luajit": {
-        "wall_ms": 0.0,
-        "relative": 0.0
+        "wall_ms": 10.0,
+        "relative": 0.015625
       },
       "quickjs": {
-        "wall_ms": 110.0,
-        "relative": 1.375
+        "wall_ms": 800.0,
+        "relative": 1.25
       },
       "v8": {
-        "wall_ms": 30.0,
-        "relative": 0.375
+        "wall_ms": 150.0,
+        "relative": 0.234375
       },
       "v8-nojit": {
-        "wall_ms": 80.0,
-        "relative": 1.0
+        "wall_ms": 450.0,
+        "relative": 0.703125
       }
     },
     {
       "name": "call/ackermann",
       "category": "call",
       "lua": {
-        "wall_ms": 140.0,
+        "wall_ms": 420.0,
         "relative": 1.0
       },
+      "lua55": {
+        "wall_ms": 440.0,
+        "relative": 1.0476190476190477
+      },
       "luajit": {
-        "wall_ms": 30.0,
+        "wall_ms": 90.0,
         "relative": 0.21428571428571427
       },
       "quickjs": {
-        "wall_ms": 240.0,
-        "relative": 1.7142857142857142
+        "wall_ms": 900.0,
+        "relative": 2.142857142857143
       },
       "v8": {
-        "wall_ms": 30.0,
-        "relative": 0.21428571428571427
+        "wall_ms": 100.0,
+        "relative": 0.23809523809523808
       },
       "v8-nojit": {
-        "wall_ms": 190.0,
-        "relative": 1.3571428571428572
+        "wall_ms": 650.0,
+        "relative": 1.5476190476190477
+      }
+    },
+    {
+      "name": "call/closure",
+      "category": "call",
+      "lua": {
+        "wall_ms": 540.0,
+        "relative": 1.0
+      },
+      "lua55": {
+        "wall_ms": 510.0,
+        "relative": 0.9444444444444444
+      },
+      "luajit": {
+        "wall_ms": 40.0,
+        "relative": 0.07407407407407407
+      },
+      "quickjs": {
+        "wall_ms": 850.0,
+        "relative": 1.5740740740740742
+      },
+      "v8": {
+        "wall_ms": 200.0,
+        "relative": 0.37037037037037035
+      },
+      "v8-nojit": {
+        "wall_ms": 1030.0,
+        "relative": 1.9074074074074074
       }
     },
     {
       "name": "call/fibonacci",
       "category": "call",
       "lua": {
-        "wall_ms": 340.0,
+        "wall_ms": 1570.0,
+        "relative": 1.0
+      },
+      "lua55": {
+        "wall_ms": 1510.0,
+        "relative": 0.9617834394904459
+      },
+      "luajit": {
+        "wall_ms": 310.0,
+        "relative": 0.19745222929936307
+      },
+      "quickjs": {
+        "wall_ms": 2170.0,
+        "relative": 1.3821656050955413
+      },
+      "v8": {
+        "wall_ms": 240.0,
+        "relative": 0.15286624203821655
+      },
+      "v8-nojit": {
+        "wall_ms": 2290.0,
+        "relative": 1.4585987261146496
+      }
+    },
+    {
+      "name": "call/method_dispatch",
+      "category": "call",
+      "lua": {
+        "wall_ms": 580.0,
+        "relative": 1.0
+      },
+      "lua55": {
+        "wall_ms": 580.0,
         "relative": 1.0
       },
       "luajit": {
-        "wall_ms": 70.0,
-        "relative": 0.20588235294117646
+        "wall_ms": 80.0,
+        "relative": 0.13793103448275862
       },
       "quickjs": {
-        "wall_ms": 500.0,
-        "relative": 1.4705882352941178
+        "wall_ms": 800.0,
+        "relative": 1.3793103448275863
       },
       "v8": {
-        "wall_ms": 60.0,
-        "relative": 0.17647058823529413
+        "wall_ms": 70.0,
+        "relative": 0.1206896551724138
       },
       "v8-nojit": {
-        "wall_ms": 530.0,
-        "relative": 1.5588235294117647
+        "wall_ms": 540.0,
+        "relative": 0.9310344827586207
       }
     },
     {
       "name": "call/queens",
       "category": "call",
       "lua": {
-        "wall_ms": 240.0,
+        "wall_ms": 1510.0,
+        "relative": 1.0
+      },
+      "lua55": {
+        "wall_ms": 1340.0,
+        "relative": 0.8874172185430463
+      },
+      "luajit": {
+        "wall_ms": 430.0,
+        "relative": 0.2847682119205298
+      },
+      "quickjs": {
+        "wall_ms": 2730.0,
+        "relative": 1.8079470198675496
+      },
+      "v8": {
+        "wall_ms": 620.0,
+        "relative": 0.4105960264900662
+      },
+      "v8-nojit": {
+        "wall_ms": 1930.0,
+        "relative": 1.2781456953642385
+      }
+    },
+    {
+      "name": "call/tak",
+      "category": "call",
+      "lua": {
+        "wall_ms": 1010.0,
+        "relative": 1.0
+      },
+      "lua55": {
+        "wall_ms": 1010.0,
         "relative": 1.0
       },
       "luajit": {
-        "wall_ms": 70.0,
-        "relative": 0.2916666666666667
+        "wall_ms": 290.0,
+        "relative": 0.2871287128712871
       },
       "quickjs": {
-        "wall_ms": 490.0,
-        "relative": 2.0416666666666665
+        "wall_ms": 1790.0,
+        "relative": 1.7722772277227723
       },
       "v8": {
-        "wall_ms": 110.0,
-        "relative": 0.4583333333333333
+        "wall_ms": 180.0,
+        "relative": 0.1782178217821782
       },
       "v8-nojit": {
-        "wall_ms": 350.0,
-        "relative": 1.4583333333333333
+        "wall_ms": 1780.0,
+        "relative": 1.7623762376237624
       }
     },
     {
       "name": "compute/fannkuch",
       "category": "compute",
       "lua": {
-        "wall_ms": 2150.0,
+        "wall_ms": 2120.0,
         "relative": 1.0
       },
+      "lua55": {
+        "wall_ms": 1950.0,
+        "relative": 0.9198113207547169
+      },
       "luajit": {
-        "wall_ms": 370.0,
-        "relative": 0.17209302325581396
+        "wall_ms": 310.0,
+        "relative": 0.14622641509433962
       },
       "quickjs": {
-        "wall_ms": 3070.0,
-        "relative": 1.427906976744186
+        "wall_ms": 3110.0,
+        "relative": 1.4669811320754718
       },
       "v8": {
-        "wall_ms": 200.0,
-        "relative": 0.09302325581395349
+        "wall_ms": 180.0,
+        "relative": 0.08490566037735849
       },
       "v8-nojit": {
-        "wall_ms": 2900.0,
-        "relative": 1.3488372093023255
+        "wall_ms": 2710.0,
+        "relative": 1.278301886792453
       }
     },
     {
       "name": "compute/mandelbrot",
       "category": "compute",
       "lua": {
-        "wall_ms": 480.0,
+        "wall_ms": 950.0,
+        "relative": 1.0
+      },
+      "lua55": {
+        "wall_ms": 950.0,
         "relative": 1.0
       },
       "luajit": {
-        "wall_ms": 40.0,
-        "relative": 0.08333333333333333
+        "wall_ms": 70.0,
+        "relative": 0.07368421052631578
       },
       "quickjs": {
-        "wall_ms": 1180.0,
-        "relative": 2.4583333333333335
+        "wall_ms": 2460.0,
+        "relative": 2.5894736842105264
       },
       "v8": {
-        "wall_ms": 60.0,
-        "relative": 0.125
+        "wall_ms": 110.0,
+        "relative": 0.11578947368421053
       },
       "v8-nojit": {
-        "wall_ms": 970.0,
-        "relative": 2.0208333333333335
+        "wall_ms": 1920.0,
+        "relative": 2.0210526315789474
+      }
+    },
+    {
+      "name": "compute/matrix",
+      "category": "compute",
+      "lua": {
+        "wall_ms": 260.0,
+        "relative": 1.0
+      },
+      "lua55": {
+        "wall_ms": 230.0,
+        "relative": 0.8846153846153846
+      },
+      "luajit": {
+        "wall_ms": 20.0,
+        "relative": 0.07692307692307693
+      },
+      "quickjs": {
+        "wall_ms": 450.0,
+        "relative": 1.7307692307692308
+      },
+      "v8": {
+        "wall_ms": 30.0,
+        "relative": 0.11538461538461539
+      },
+      "v8-nojit": {
+        "wall_ms": 450.0,
+        "relative": 1.7307692307692308
       }
     },
     {
       "name": "compute/nbody",
       "category": "compute",
       "lua": {
-        "wall_ms": 570.0,
+        "wall_ms": 510.0,
         "relative": 1.0
       },
+      "lua55": {
+        "wall_ms": 520.0,
+        "relative": 1.0196078431372548
+      },
       "luajit": {
-        "wall_ms": 60.0,
-        "relative": 0.10526315789473684
+        "wall_ms": 50.0,
+        "relative": 0.09803921568627451
       },
       "quickjs": {
-        "wall_ms": 1070.0,
-        "relative": 1.8771929824561404
+        "wall_ms": 910.0,
+        "relative": 1.7843137254901962
       },
       "v8": {
-        "wall_ms": 40.0,
-        "relative": 0.07017543859649122
+        "wall_ms": 30.0,
+        "relative": 0.058823529411764705
       },
       "v8-nojit": {
-        "wall_ms": 1130.0,
-        "relative": 1.9824561403508771
+        "wall_ms": 910.0,
+        "relative": 1.7843137254901962
+      }
+    },
+    {
+      "name": "compute/sieve",
+      "category": "compute",
+      "lua": {
+        "wall_ms": 870.0,
+        "relative": 1.0
+      },
+      "lua55": {
+        "wall_ms": 460.0,
+        "relative": 0.5287356321839081
+      },
+      "luajit": {
+        "wall_ms": 180.0,
+        "relative": 0.20689655172413793
+      },
+      "quickjs": {
+        "wall_ms": 3300.0,
+        "relative": 3.793103448275862
+      },
+      "v8": {
+        "wall_ms": 150.0,
+        "relative": 0.1724137931034483
+      },
+      "v8-nojit": {
+        "wall_ms": 1220.0,
+        "relative": 1.4022988505747127
       }
     },
     {
       "name": "compute/spectral_norm",
       "category": "compute",
       "lua": {
-        "wall_ms": 290.0,
+        "wall_ms": 910.0,
         "relative": 1.0
       },
+      "lua55": {
+        "wall_ms": 840.0,
+        "relative": 0.9230769230769231
+      },
       "luajit": {
-        "wall_ms": 10.0,
-        "relative": 0.034482758620689655
+        "wall_ms": 30.0,
+        "relative": 0.03296703296703297
       },
       "quickjs": {
-        "wall_ms": 470.0,
-        "relative": 1.6206896551724137
+        "wall_ms": 1560.0,
+        "relative": 1.7142857142857142
       },
       "v8": {
-        "wall_ms": 40.0,
-        "relative": 0.13793103448275862
+        "wall_ms": 100.0,
+        "relative": 0.10989010989010989
       },
       "v8-nojit": {
-        "wall_ms": 520.0,
-        "relative": 1.793103448275862
+        "wall_ms": 1770.0,
+        "relative": 1.945054945054945
       }
     },
     {
       "name": "coroutine/scheduler",
       "category": "coroutine",
       "lua": {
-        "wall_ms": 10.0,
+        "wall_ms": 420.0,
         "relative": 1.0
+      },
+      "lua55": {
+        "wall_ms": 410.0,
+        "relative": 0.9761904761904762
       },
       "luajit": {
-        "wall_ms": 0.0,
-        "relative": 0.0
+        "wall_ms": 200.0,
+        "relative": 0.47619047619047616
       },
       "quickjs": {
-        "wall_ms": 10.0,
-        "relative": 1.0
+        "wall_ms": 500.0,
+        "relative": 1.1904761904761905
       },
       "v8": {
-        "wall_ms": 10.0,
-        "relative": 1.0
+        "wall_ms": 80.0,
+        "relative": 0.19047619047619047
       },
       "v8-nojit": {
-        "wall_ms": 20.0,
-        "relative": 2.0
+        "wall_ms": 360.0,
+        "relative": 0.8571428571428571
       }
     },
     {
       "name": "string/fasta",
       "category": "string",
       "lua": {
-        "wall_ms": 100.0,
+        "wall_ms": 440.0,
         "relative": 1.0
       },
+      "lua55": {
+        "wall_ms": 460.0,
+        "relative": 1.0454545454545454
+      },
       "luajit": {
-        "wall_ms": 40.0,
-        "relative": 0.4
+        "wall_ms": 160.0,
+        "relative": 0.36363636363636365
       },
       "quickjs": {
-        "wall_ms": 160.0,
-        "relative": 1.6
+        "wall_ms": 710.0,
+        "relative": 1.6136363636363635
       },
       "v8": {
-        "wall_ms": 30.0,
-        "relative": 0.3
+        "wall_ms": 110.0,
+        "relative": 0.25
       },
       "v8-nojit": {
-        "wall_ms": 190.0,
-        "relative": 1.9
+        "wall_ms": 640.0,
+        "relative": 1.4545454545454546
       }
     },
     {
       "name": "string/json_parse",
       "category": "string",
       "lua": {
-        "wall_ms": 50.0,
+        "wall_ms": 470.0,
         "relative": 1.0
       },
+      "lua55": {
+        "wall_ms": 460.0,
+        "relative": 0.9787234042553191
+      },
       "luajit": {
-        "wall_ms": 10.0,
-        "relative": 0.2
+        "wall_ms": 190.0,
+        "relative": 0.40425531914893614
       },
       "quickjs": {
-        "wall_ms": 0.0,
-        "relative": 0.0
+        "wall_ms": 430.0,
+        "relative": 0.9148936170212766
       },
       "v8": {
-        "wall_ms": 10.0,
-        "relative": 0.2
+        "wall_ms": 70.0,
+        "relative": 0.14893617021276595
       },
       "v8-nojit": {
-        "wall_ms": 20.0,
+        "wall_ms": 310.0,
+        "relative": 0.6595744680851063
+      }
+    },
+    {
+      "name": "string/string_concat",
+      "category": "string",
+      "lua": {
+        "wall_ms": 150.0,
+        "relative": 1.0
+      },
+      "lua55": {
+        "wall_ms": 130.0,
+        "relative": 0.8666666666666667
+      },
+      "luajit": {
+        "wall_ms": 60.0,
         "relative": 0.4
+      },
+      "quickjs": {
+        "wall_ms": 250.0,
+        "relative": 1.6666666666666667
+      },
+      "v8": {
+        "wall_ms": 100.0,
+        "relative": 0.6666666666666666
+      },
+      "v8-nojit": {
+        "wall_ms": 200.0,
+        "relative": 1.3333333333333333
       }
     },
     {
       "name": "table/array_access",
       "category": "table",
       "lua": {
-        "wall_ms": 220.0,
+        "wall_ms": 750.0,
         "relative": 1.0
       },
+      "lua55": {
+        "wall_ms": 630.0,
+        "relative": 0.84
+      },
       "luajit": {
-        "wall_ms": 70.0,
-        "relative": 0.3181818181818182
+        "wall_ms": 250.0,
+        "relative": 0.3333333333333333
       },
       "quickjs": {
-        "wall_ms": 510.0,
-        "relative": 2.3181818181818183
+        "wall_ms": 1960.0,
+        "relative": 2.6133333333333333
       },
       "v8": {
-        "wall_ms": 40.0,
-        "relative": 0.18181818181818182
+        "wall_ms": 130.0,
+        "relative": 0.17333333333333334
       },
       "v8-nojit": {
-        "wall_ms": 360.0,
-        "relative": 1.6363636363636365
+        "wall_ms": 1330.0,
+        "relative": 1.7733333333333334
       }
     },
     {
       "name": "table/table_insert",
       "category": "table",
       "lua": {
-        "wall_ms": 900.0,
+        "wall_ms": 1130.0,
         "relative": 1.0
       },
+      "lua55": {
+        "wall_ms": 1100.0,
+        "relative": 0.9734513274336283
+      },
       "luajit": {
-        "wall_ms": 390.0,
-        "relative": 0.43333333333333335
+        "wall_ms": 500.0,
+        "relative": 0.4424778761061947
       },
       "quickjs": {
-        "wall_ms": 280.0,
-        "relative": 0.3111111111111111
+        "wall_ms": 430.0,
+        "relative": 0.3805309734513274
       },
       "v8": {
-        "wall_ms": 700.0,
-        "relative": 0.7777777777777778
+        "wall_ms": 380.0,
+        "relative": 0.336283185840708
       },
       "v8-nojit": {
-        "wall_ms": 830.0,
-        "relative": 0.9222222222222223
+        "wall_ms": 390.0,
+        "relative": 0.34513274336283184
+      }
+    },
+    {
+      "name": "table/table_ops",
+      "category": "table",
+      "lua": {
+        "wall_ms": 1420.0,
+        "relative": 1.0
+      },
+      "lua55": {
+        "wall_ms": 1410.0,
+        "relative": 0.9929577464788732
+      },
+      "luajit": {
+        "wall_ms": 630.0,
+        "relative": 0.44366197183098594
+      },
+      "quickjs": {
+        "wall_ms": 1040.0,
+        "relative": 0.7323943661971831
+      },
+      "v8": {
+        "wall_ms": 510.0,
+        "relative": 0.3591549295774648
+      },
+      "v8-nojit": {
+        "wall_ms": 620.0,
+        "relative": 0.43661971830985913
       }
     }
   ],
   "memory": [
     {
       "name": "alloc/binary_trees",
-      "lua": 21280,
-      "luajit": 27840,
+      "lua": 20160,
+      "lua55": 33600,
+      "luajit": 30240,
       "quickjs": 19360,
-      "v8": 49600,
-      "v8-nojit": 40480
+      "v8": 48960,
+      "v8-nojit": 40000
+    },
+    {
+      "name": "alloc/gc_stress",
+      "lua": 370400,
+      "lua55": 385280,
+      "luajit": 252960,
+      "quickjs": 225120,
+      "v8": 104160,
+      "v8-nojit": 119840
     },
     {
       "name": "alloc/object_churn",
-      "lua": 2080,
+      "lua": 2240,
+      "lua55": 2240,
       "luajit": 2400,
       "quickjs": 3040,
-      "v8": 28160,
-      "v8-nojit": 20320
+      "v8": 27840,
+      "v8-nojit": 20160
     },
     {
       "name": "call/ackermann",
-      "lua": 2560,
-      "luajit": 2576,
-      "quickjs": 5920,
-      "v8": 26080,
+      "lua": 3360,
+      "lua55": 3520,
+      "luajit": 2880,
+      "quickjs": 8640,
+      "v8": 25760,
       "v8-nojit": 18560
     },
     {
+      "name": "call/closure",
+      "lua": 2240,
+      "lua55": 2240,
+      "luajit": 2400,
+      "quickjs": 3040,
+      "v8": 29280,
+      "v8-nojit": 20160
+    },
+    {
       "name": "call/fibonacci",
-      "lua": 2080,
+      "lua": 2240,
+      "lua55": 2240,
       "luajit": 2560,
       "quickjs": 3040,
-      "v8": 25440,
-      "v8-nojit": 18080
+      "v8": 24800,
+      "v8-nojit": 17600
+    },
+    {
+      "name": "call/method_dispatch",
+      "lua": 2080,
+      "lua55": 2240,
+      "luajit": 2400,
+      "quickjs": 3040,
+      "v8": 28320,
+      "v8-nojit": 20160
     },
     {
       "name": "call/queens",
-      "lua": 2240,
+      "lua": 2080,
+      "lua55": 2080,
       "luajit": 2400,
       "quickjs": 3040,
-      "v8": 26240,
-      "v8-nojit": 18240
+      "v8": 25920,
+      "v8-nojit": 17760
+    },
+    {
+      "name": "call/tak",
+      "lua": 2240,
+      "lua55": 2080,
+      "luajit": 2400,
+      "quickjs": 3040,
+      "v8": 24960,
+      "v8-nojit": 17600
     },
     {
       "name": "compute/fannkuch",
       "lua": 2240,
-      "luajit": 2560,
+      "lua55": 2400,
+      "luajit": 2400,
       "quickjs": 3040,
-      "v8": 26720,
-      "v8-nojit": 18400
+      "v8": 26080,
+      "v8-nojit": 17920
     },
     {
       "name": "compute/mandelbrot",
       "lua": 2400,
+      "lua55": 2400,
       "luajit": 2560,
       "quickjs": 3040,
-      "v8": 27680,
+      "v8": 27040,
       "v8-nojit": 20480
+    },
+    {
+      "name": "compute/matrix",
+      "lua": 6400,
+      "lua55": 4640,
+      "luajit": 4320,
+      "quickjs": 6560,
+      "v8": 29280,
+      "v8-nojit": 23200
     },
     {
       "name": "compute/nbody",
       "lua": 2400,
+      "lua55": 2400,
       "luajit": 2560,
       "quickjs": 3040,
-      "v8": 28800,
-      "v8-nojit": 20800
+      "v8": 27840,
+      "v8-nojit": 20480
+    },
+    {
+      "name": "compute/sieve",
+      "lua": 34784,
+      "lua55": 38044,
+      "luajit": 166080,
+      "quickjs": 104600,
+      "v8": 89440,
+      "v8-nojit": 87840
     },
     {
       "name": "compute/spectral_norm",
       "lua": 2400,
+      "lua55": 2400,
       "luajit": 2400,
       "quickjs": 3040,
-      "v8": 28960,
-      "v8-nojit": 20800
+      "v8": 27840,
+      "v8-nojit": 20640
     },
     {
       "name": "coroutine/scheduler",
       "lua": 2240,
-      "luajit": 2560,
+      "lua55": 2240,
+      "luajit": 2400,
       "quickjs": 3200,
-      "v8": 28640,
-      "v8-nojit": 20480
+      "v8": 28320,
+      "v8-nojit": 20160
     },
     {
       "name": "string/fasta",
       "lua": 2400,
+      "lua55": 2400,
       "luajit": 2560,
       "quickjs": 3040,
-      "v8": 29280,
-      "v8-nojit": 20640
+      "v8": 29120,
+      "v8-nojit": 20160
     },
     {
       "name": "string/json_parse",
-      "lua": 7356,
-      "luajit": 7348,
-      "quickjs": 6240,
-      "v8": 31680,
-      "v8-nojit": 23520
+      "lua": 48520,
+      "lua55": 48660,
+      "luajit": 51904,
+      "quickjs": 35200,
+      "v8": 85988,
+      "v8-nojit": 75840
+    },
+    {
+      "name": "string/string_concat",
+      "lua": 142720,
+      "lua55": 75680,
+      "luajit": 77600,
+      "quickjs": 85920,
+      "v8": 107928,
+      "v8-nojit": 95388
     },
     {
       "name": "table/array_access",
-      "lua": 133120,
-      "luajit": 67840,
-      "quickjs": 81120,
-      "v8": 46240,
-      "v8-nojit": 37760
+      "lua": 526400,
+      "lua55": 296900,
+      "luajit": 264480,
+      "quickjs": 315520,
+      "v8": 103840,
+      "v8-nojit": 95840
     },
     {
       "name": "table/table_insert",
       "lua": 112192,
-      "luajit": 81860,
-      "quickjs": 107248,
-      "v8": 109092,
-      "v8-nojit": 103896
+      "lua55": 112184,
+      "luajit": 81856,
+      "quickjs": 109600,
+      "v8": 97100,
+      "v8-nojit": 88816
+    },
+    {
+      "name": "table/table_ops",
+      "lua": 222252,
+      "lua55": 215620,
+      "luajit": 184304,
+      "quickjs": 187840,
+      "v8": 117956,
+      "v8-nojit": 143868
     }
   ]
 };
