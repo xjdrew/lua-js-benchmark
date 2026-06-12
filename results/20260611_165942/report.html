@@ -1,0 +1,1664 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>lua-js-benchmark Report</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; color: #333; padding: 20px; }
+  h1 { text-align: center; margin: 20px 0; color: #1a1a2e; }
+  h2 { margin: 30px 0 15px; color: #16213e; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; }
+  .container { max-width: 1200px; margin: 0 auto; }
+  .card { background: white; border-radius: 8px; padding: 20px; margin: 15px 0; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+  .chart-container { position: relative; height: 400px; }
+  .chart-container.tall { height: 500px; }
+  table { width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 14px; }
+  th, td { padding: 8px 12px; border: 1px solid #e2e8f0; text-align: right; }
+  th { background: #f8fafc; font-weight: 600; }
+  td:first-child, th:first-child { text-align: left; }
+  tr:nth-child(even) { background: #f8fafc; }
+  .baseline { color: #666; font-style: italic; }
+  .faster { color: #059669; font-weight: 600; }
+  .slower { color: #dc2626; }
+  .rank { font-weight: 700; font-size: 18px; }
+  .subtitle { text-align: center; color: #666; margin-bottom: 20px; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<h1>lua-js-benchmark Report</h1>
+<p class="subtitle">Baseline: <strong>lua</strong> (1.00x) &mdash; lower is better</p>
+
+<div id="envSection" style="display:none;">
+  <h2>Test Environment</h2>
+  <div class="card">
+    <table id="envTable"></table>
+  </div>
+  <div class="card">
+    <table id="enginesTable"></table>
+  </div>
+</div>
+
+<h2>Overall Performance</h2>
+<div class="card">
+  <div class="chart-container tall">
+    <canvas id="overallChart"></canvas>
+  </div>
+</div>
+
+<div class="card">
+  <table id="overallTable"></table>
+</div>
+
+<h2>Performance by Category</h2>
+<div class="card">
+  <div class="chart-container">
+    <canvas id="categoryChart"></canvas>
+  </div>
+</div>
+
+<h2>Detailed Results</h2>
+<div class="card">
+  <div class="chart-container tall">
+    <canvas id="detailChart"></canvas>
+  </div>
+</div>
+
+<div class="card">
+  <table id="detailTable"></table>
+</div>
+
+<h2>Radar: Strengths & Weaknesses</h2>
+<div class="card">
+  <div class="chart-container">
+    <canvas id="radarChart"></canvas>
+  </div>
+</div>
+
+<h2>Memory Usage (Peak RSS)</h2>
+<div class="card">
+  <div class="chart-container tall">
+    <canvas id="memoryChart"></canvas>
+  </div>
+</div>
+
+</div>
+
+<script>
+const DATA = {
+  "baseline": "lua",
+  "engines": [
+    "lua",
+    "lua55",
+    "luajit",
+    "luau",
+    "luau-codegen",
+    "quickjs",
+    "v8",
+    "v8-nojit"
+  ],
+  "categories": [
+    "alloc",
+    "call",
+    "compute",
+    "coroutine",
+    "string",
+    "table"
+  ],
+  "system_info": {
+    "system": {
+      "date": "2026-06-11 08:59:42 UTC",
+      "os": "Linux",
+      "kernel": "6.6.87.2-microsoft-standard-WSL2",
+      "arch": "x86_64",
+      "cpu": "Intel(R) Core(TM) Ultra 7 255HX",
+      "cpu_cores": 20,
+      "memory": "15Gi",
+      "compiler": "cc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0"
+    },
+    "engines": {
+      "lua": {
+        "display_name": "Lua 5.4",
+        "version": "Lua 5.4.7  Copyright (C) 1994-2024 Lua.org, PUC-Rio",
+        "build_flags": "-O2"
+      },
+      "lua55": {
+        "display_name": "Lua 5.5",
+        "version": "Lua 5.5.0  Copyright (C) 1994-2025 Lua.org, PUC-Rio",
+        "build_flags": "-O2"
+      },
+      "luajit": {
+        "display_name": "LuaJIT 2.1",
+        "version": "LuaJIT 2.1.1780076327 -- Copyright (C) 2005-2026 Mike Pall. https://luajit.org/",
+        "build_flags": "-O2 -fomit-frame-pointer"
+      },
+      "luau": {
+        "display_name": "Luau",
+        "version": "Luau",
+        "build_flags": "-O2 (Release)"
+      },
+      "luau-codegen": {
+        "display_name": "Luau (codegen)",
+        "version": "Luau",
+        "build_flags": "-O2 (Release, native codegen)"
+      },
+      "quickjs": {
+        "display_name": "QuickJS",
+        "version": "QuickJS version 2026-06-04",
+        "build_flags": "-O2"
+      },
+      "v8": {
+        "display_name": "V8 (JIT)",
+        "version": "V8 version 15.1.0 (candidate)",
+        "build_flags": "-O2 (release)"
+      },
+      "v8-nojit": {
+        "display_name": "V8 (no-JIT)",
+        "version": "V8 version 15.1.0 (candidate)",
+        "build_flags": "-O2 (release)"
+      }
+    },
+    "config": {
+      "runs": 5,
+      "warmup": 2,
+      "category": "all"
+    }
+  },
+  "overall": [
+    {
+      "engine": "v8",
+      "total_ms": 3240.0,
+      "relative": 0.18202247191011237,
+      "category_breakdown": {
+        "alloc": 330.0,
+        "call": 1150.0,
+        "compute": 620.0,
+        "coroutine": 70.0,
+        "startup": 0.0,
+        "string": 270.0,
+        "table": 800.0
+      }
+    },
+    {
+      "engine": "luajit",
+      "total_ms": 4400.0,
+      "relative": 0.24719101123595505,
+      "category_breakdown": {
+        "alloc": 740.0,
+        "call": 1090.0,
+        "compute": 740.0,
+        "coroutine": 220.0,
+        "startup": 0.0,
+        "string": 460.0,
+        "table": 1150.0
+      }
+    },
+    {
+      "engine": "luau-codegen",
+      "total_ms": 11940.0,
+      "relative": 0.6707865168539325,
+      "category_breakdown": {
+        "alloc": 1540.0,
+        "call": 3940.0,
+        "compute": 3170.0,
+        "coroutine": 190.0,
+        "startup": 0.0,
+        "string": 880.0,
+        "table": 2220.0
+      }
+    },
+    {
+      "engine": "lua55",
+      "total_ms": 16940.0,
+      "relative": 0.9516853932584269,
+      "category_breakdown": {
+        "alloc": 2590.0,
+        "call": 4870.0,
+        "compute": 5180.0,
+        "coroutine": 460.0,
+        "startup": 0.0,
+        "string": 1130.0,
+        "table": 2710.0
+      }
+    },
+    {
+      "engine": "luau",
+      "total_ms": 17050.0,
+      "relative": 0.9578651685393258,
+      "category_breakdown": {
+        "alloc": 1950.0,
+        "call": 5520.0,
+        "compute": 5590.0,
+        "coroutine": 230.0,
+        "startup": 0.0,
+        "string": 1100.0,
+        "table": 2660.0
+      }
+    },
+    {
+      "engine": "lua",
+      "total_ms": 17800.0,
+      "relative": 1.0,
+      "category_breakdown": {
+        "alloc": 2940.0,
+        "call": 4970.0,
+        "compute": 5310.0,
+        "coroutine": 450.0,
+        "startup": 0.0,
+        "string": 1150.0,
+        "table": 2980.0
+      }
+    },
+    {
+      "engine": "v8-nojit",
+      "total_ms": 20770.0,
+      "relative": 1.1668539325842697,
+      "category_breakdown": {
+        "alloc": 1040.0,
+        "call": 7190.0,
+        "compute": 8960.0,
+        "coroutine": 350.0,
+        "startup": 0.0,
+        "string": 1180.0,
+        "table": 2050.0
+      }
+    },
+    {
+      "engine": "quickjs",
+      "total_ms": 27310.0,
+      "relative": 1.5342696629213484,
+      "category_breakdown": {
+        "alloc": 2190.0,
+        "call": 8080.0,
+        "compute": 12190.0,
+        "coroutine": 510.0,
+        "startup": 0.0,
+        "string": 1380.0,
+        "table": 2960.0
+      }
+    }
+  ],
+  "category_summary": {
+    "alloc": {
+      "lua": 1.0,
+      "lua55": 0.8809959617582123,
+      "luajit": 0.26516046969767476,
+      "luau": 0.6268612882043009,
+      "luau-codegen": 0.48980356875093717,
+      "quickjs": 0.9699293178422035,
+      "v8": 0.14495323188608125,
+      "v8-nojit": 0.4742855517810146
+    },
+    "call": {
+      "lua": 1.0,
+      "lua55": 1.0008400412392662,
+      "luajit": 0.198650161172448,
+      "luau": 1.1248369026179104,
+      "luau-codegen": 0.8019423792185421,
+      "quickjs": 1.6488809738208963,
+      "v8": 0.2243343773653851,
+      "v8-nojit": 1.4418082830892909
+    },
+    "compute": {
+      "lua": 1.0,
+      "lua55": 0.9378760803287248,
+      "luajit": 0.12001610698121198,
+      "luau": 1.002084501029207,
+      "luau-codegen": 0.5671936525442328,
+      "quickjs": 2.301588875530532,
+      "v8": 0.12067203615361376,
+      "v8-nojit": 1.7664922084644052
+    },
+    "coroutine": {
+      "lua": 1.0,
+      "lua55": 1.0222222222222221,
+      "luajit": 0.4888888888888889,
+      "luau": 0.5111111111111111,
+      "luau-codegen": 0.4222222222222222,
+      "quickjs": 1.1333333333333333,
+      "v8": 0.15555555555555556,
+      "v8-nojit": 0.7777777777777778
+    },
+    "string": {
+      "lua": 1.0,
+      "lua55": 0.9506855791962175,
+      "luajit": 0.39601260835303387,
+      "luau": 0.9192592592592592,
+      "luau-codegen": 0.742080378250591,
+      "quickjs": 1.268936170212766,
+      "v8": 0.29092198581560286,
+      "v8-nojit": 1.0390858944050434
+    },
+    "table": {
+      "lua": 1.0,
+      "lua55": 0.8951558631960969,
+      "luajit": 0.37962662532746894,
+      "luau": 0.8936597207200712,
+      "luau-codegen": 0.7392235681495902,
+      "quickjs": 1.1446301103179755,
+      "v8": 0.26559232821400247,
+      "v8-nojit": 0.8219981012810345
+    }
+  },
+  "benchmarks": [
+    {
+      "name": "alloc/binary_trees",
+      "category": "alloc",
+      "lua": {
+        "wall_ms": 580.0,
+        "relative": 1.0
+      },
+      "lua55": {
+        "wall_ms": 530.0,
+        "relative": 0.9137931034482759
+      },
+      "luajit": {
+        "wall_ms": 310.0,
+        "relative": 0.5344827586206896
+      },
+      "luau": {
+        "wall_ms": 340.0,
+        "relative": 0.5862068965517241
+      },
+      "luau-codegen": {
+        "wall_ms": 290.0,
+        "relative": 0.5
+      },
+      "quickjs": {
+        "wall_ms": 710.0,
+        "relative": 1.2241379310344827
+      },
+      "v8": {
+        "wall_ms": 70.0,
+        "relative": 0.1206896551724138
+      },
+      "v8-nojit": {
+        "wall_ms": 330.0,
+        "relative": 0.5689655172413793
+      }
+    },
+    {
+      "name": "alloc/gc_stress",
+      "category": "alloc",
+      "lua": {
+        "wall_ms": 1710.0,
+        "relative": 1.0
+      },
+      "lua55": {
+        "wall_ms": 1510.0,
+        "relative": 0.8830409356725146
+      },
+      "luajit": {
+        "wall_ms": 420.0,
+        "relative": 0.24561403508771928
+      },
+      "luau": {
+        "wall_ms": 1240.0,
+        "relative": 0.7251461988304093
+      },
+      "luau-codegen": {
+        "wall_ms": 1000.0,
+        "relative": 0.5847953216374269
+      },
+      "quickjs": {
+        "wall_ms": 620.0,
+        "relative": 0.36257309941520466
+      },
+      "v8": {
+        "wall_ms": 90.0,
+        "relative": 0.05263157894736842
+      },
+      "v8-nojit": {
+        "wall_ms": 250.0,
+        "relative": 0.14619883040935672
+      }
+    },
+    {
+      "name": "alloc/object_churn",
+      "category": "alloc",
+      "lua": {
+        "wall_ms": 650.0,
+        "relative": 1.0
+      },
+      "lua55": {
+        "wall_ms": 550.0,
+        "relative": 0.8461538461538461
+      },
+      "luajit": {
+        "wall_ms": 10.0,
+        "relative": 0.015384615384615385
+      },
+      "luau": {
+        "wall_ms": 370.0,
+        "relative": 0.5692307692307692
+      },
+      "luau-codegen": {
+        "wall_ms": 250.0,
+        "relative": 0.38461538461538464
+      },
+      "quickjs": {
+        "wall_ms": 860.0,
+        "relative": 1.323076923076923
+      },
+      "v8": {
+        "wall_ms": 170.0,
+        "relative": 0.26153846153846155
+      },
+      "v8-nojit": {
+        "wall_ms": 460.0,
+        "relative": 0.7076923076923077
+      }
+    },
+    {
+      "name": "call/ackermann",
+      "category": "call",
+      "lua": {
+        "wall_ms": 440.0,
+        "relative": 1.0
+      },
+      "lua55": {
+        "wall_ms": 460.0,
+        "relative": 1.0454545454545454
+      },
+      "luajit": {
+        "wall_ms": 90.0,
+        "relative": 0.20454545454545456
+      },
+      "luau": {
+        "wall_ms": 560.0,
+        "relative": 1.2727272727272727
+      },
+      "luau-codegen": {
+        "wall_ms": 340.0,
+        "relative": 0.7727272727272727
+      },
+      "quickjs": {
+        "wall_ms": 890.0,
+        "relative": 2.022727272727273
+      },
+      "v8": {
+        "wall_ms": 90.0,
+        "relative": 0.20454545454545456
+      },
+      "v8-nojit": {
+        "wall_ms": 660.0,
+        "relative": 1.5
+      }
+    },
+    {
+      "name": "call/closure",
+      "category": "call",
+      "lua": {
+        "wall_ms": 540.0,
+        "relative": 1.0
+      },
+      "lua55": {
+        "wall_ms": 540.0,
+        "relative": 1.0
+      },
+      "luajit": {
+        "wall_ms": 40.0,
+        "relative": 0.07407407407407407
+      },
+      "luau": {
+        "wall_ms": 610.0,
+        "relative": 1.1296296296296295
+      },
+      "luau-codegen": {
+        "wall_ms": 440.0,
+        "relative": 0.8148148148148148
+      },
+      "quickjs": {
+        "wall_ms": 800.0,
+        "relative": 1.4814814814814814
+      },
+      "v8": {
+        "wall_ms": 180.0,
+        "relative": 0.3333333333333333
+      },
+      "v8-nojit": {
+        "wall_ms": 850.0,
+        "relative": 1.5740740740740742
+      }
+    },
+    {
+      "name": "call/fibonacci",
+      "category": "call",
+      "lua": {
+        "wall_ms": 1250.0,
+        "relative": 1.0
+      },
+      "lua55": {
+        "wall_ms": 1330.0,
+        "relative": 1.064
+      },
+      "luajit": {
+        "wall_ms": 270.0,
+        "relative": 0.216
+      },
+      "luau": {
+        "wall_ms": 1300.0,
+        "relative": 1.04
+      },
+      "luau-codegen": {
+        "wall_ms": 1010.0,
+        "relative": 0.808
+      },
+      "quickjs": {
+        "wall_ms": 1870.0,
+        "relative": 1.496
+      },
+      "v8": {
+        "wall_ms": 220.0,
+        "relative": 0.176
+      },
+      "v8-nojit": {
+        "wall_ms": 1980.0,
+        "relative": 1.584
+      }
+    },
+    {
+      "name": "call/method_dispatch",
+      "category": "call",
+      "lua": {
+        "wall_ms": 430.0,
+        "relative": 1.0
+      },
+      "lua55": {
+        "wall_ms": 450.0,
+        "relative": 1.0465116279069768
+      },
+      "luajit": {
+        "wall_ms": 70.0,
+        "relative": 0.16279069767441862
+      },
+      "luau": {
+        "wall_ms": 490.0,
+        "relative": 1.1395348837209303
+      },
+      "luau-codegen": {
+        "wall_ms": 400.0,
+        "relative": 0.9302325581395349
+      },
+      "quickjs": {
+        "wall_ms": 690.0,
+        "relative": 1.6046511627906976
+      },
+      "v8": {
+        "wall_ms": 60.0,
+        "relative": 0.13953488372093023
+      },
+      "v8-nojit": {
+        "wall_ms": 490.0,
+        "relative": 1.1395348837209303
+      }
+    },
+    {
+      "name": "call/queens",
+      "category": "call",
+      "lua": {
+        "wall_ms": 1350.0,
+        "relative": 1.0
+      },
+      "lua55": {
+        "wall_ms": 1090.0,
+        "relative": 0.8074074074074075
+      },
+      "luajit": {
+        "wall_ms": 370.0,
+        "relative": 0.2740740740740741
+      },
+      "luau": {
+        "wall_ms": 1660.0,
+        "relative": 1.2296296296296296
+      },
+      "luau-codegen": {
+        "wall_ms": 1120.0,
+        "relative": 0.8296296296296296
+      },
+      "quickjs": {
+        "wall_ms": 2330.0,
+        "relative": 1.7259259259259259
+      },
+      "v8": {
+        "wall_ms": 440.0,
+        "relative": 0.32592592592592595
+      },
+      "v8-nojit": {
+        "wall_ms": 1630.0,
+        "relative": 1.2074074074074075
+      }
+    },
+    {
+      "name": "call/tak",
+      "category": "call",
+      "lua": {
+        "wall_ms": 960.0,
+        "relative": 1.0
+      },
+      "lua55": {
+        "wall_ms": 1000.0,
+        "relative": 1.0416666666666667
+      },
+      "luajit": {
+        "wall_ms": 250.0,
+        "relative": 0.2604166666666667
+      },
+      "luau": {
+        "wall_ms": 900.0,
+        "relative": 0.9375
+      },
+      "luau-codegen": {
+        "wall_ms": 630.0,
+        "relative": 0.65625
+      },
+      "quickjs": {
+        "wall_ms": 1500.0,
+        "relative": 1.5625
+      },
+      "v8": {
+        "wall_ms": 160.0,
+        "relative": 0.16666666666666666
+      },
+      "v8-nojit": {
+        "wall_ms": 1580.0,
+        "relative": 1.6458333333333333
+      }
+    },
+    {
+      "name": "compute/fannkuch",
+      "category": "compute",
+      "lua": {
+        "wall_ms": 1850.0,
+        "relative": 1.0
+      },
+      "lua55": {
+        "wall_ms": 2130.0,
+        "relative": 1.1513513513513514
+      },
+      "luajit": {
+        "wall_ms": 350.0,
+        "relative": 0.1891891891891892
+      },
+      "luau": {
+        "wall_ms": 2120.0,
+        "relative": 1.145945945945946
+      },
+      "luau-codegen": {
+        "wall_ms": 1010.0,
+        "relative": 0.5459459459459459
+      },
+      "quickjs": {
+        "wall_ms": 3040.0,
+        "relative": 1.6432432432432433
+      },
+      "v8": {
+        "wall_ms": 180.0,
+        "relative": 0.0972972972972973
+      },
+      "v8-nojit": {
+        "wall_ms": 2520.0,
+        "relative": 1.3621621621621622
+      }
+    },
+    {
+      "name": "compute/mandelbrot",
+      "category": "compute",
+      "lua": {
+        "wall_ms": 940.0,
+        "relative": 1.0
+      },
+      "lua55": {
+        "wall_ms": 950.0,
+        "relative": 1.0106382978723405
+      },
+      "luajit": {
+        "wall_ms": 80.0,
+        "relative": 0.0851063829787234
+      },
+      "luau": {
+        "wall_ms": 900.0,
+        "relative": 0.9574468085106383
+      },
+      "luau-codegen": {
+        "wall_ms": 460.0,
+        "relative": 0.48936170212765956
+      },
+      "quickjs": {
+        "wall_ms": 2320.0,
+        "relative": 2.4680851063829787
+      },
+      "v8": {
+        "wall_ms": 100.0,
+        "relative": 0.10638297872340426
+      },
+      "v8-nojit": {
+        "wall_ms": 2000.0,
+        "relative": 2.127659574468085
+      }
+    },
+    {
+      "name": "compute/matrix",
+      "category": "compute",
+      "lua": {
+        "wall_ms": 260.0,
+        "relative": 1.0
+      },
+      "lua55": {
+        "wall_ms": 240.0,
+        "relative": 0.9230769230769231
+      },
+      "luajit": {
+        "wall_ms": 20.0,
+        "relative": 0.07692307692307693
+      },
+      "luau": {
+        "wall_ms": 250.0,
+        "relative": 0.9615384615384616
+      },
+      "luau-codegen": {
+        "wall_ms": 120.0,
+        "relative": 0.46153846153846156
+      },
+      "quickjs": {
+        "wall_ms": 440.0,
+        "relative": 1.6923076923076923
+      },
+      "v8": {
+        "wall_ms": 40.0,
+        "relative": 0.15384615384615385
+      },
+      "v8-nojit": {
+        "wall_ms": 470.0,
+        "relative": 1.8076923076923077
+      }
+    },
+    {
+      "name": "compute/nbody",
+      "category": "compute",
+      "lua": {
+        "wall_ms": 510.0,
+        "relative": 1.0
+      },
+      "lua55": {
+        "wall_ms": 500.0,
+        "relative": 0.9803921568627451
+      },
+      "luajit": {
+        "wall_ms": 50.0,
+        "relative": 0.09803921568627451
+      },
+      "luau": {
+        "wall_ms": 350.0,
+        "relative": 0.6862745098039216
+      },
+      "luau-codegen": {
+        "wall_ms": 120.0,
+        "relative": 0.23529411764705882
+      },
+      "quickjs": {
+        "wall_ms": 910.0,
+        "relative": 1.7843137254901962
+      },
+      "v8": {
+        "wall_ms": 30.0,
+        "relative": 0.058823529411764705
+      },
+      "v8-nojit": {
+        "wall_ms": 920.0,
+        "relative": 1.803921568627451
+      }
+    },
+    {
+      "name": "compute/sieve",
+      "category": "compute",
+      "lua": {
+        "wall_ms": 890.0,
+        "relative": 1.0
+      },
+      "lua55": {
+        "wall_ms": 500.0,
+        "relative": 0.5617977528089888
+      },
+      "luajit": {
+        "wall_ms": 210.0,
+        "relative": 0.23595505617977527
+      },
+      "luau": {
+        "wall_ms": 750.0,
+        "relative": 0.8426966292134831
+      },
+      "luau-codegen": {
+        "wall_ms": 680.0,
+        "relative": 0.7640449438202247
+      },
+      "quickjs": {
+        "wall_ms": 3840.0,
+        "relative": 4.314606741573034
+      },
+      "v8": {
+        "wall_ms": 160.0,
+        "relative": 0.1797752808988764
+      },
+      "v8-nojit": {
+        "wall_ms": 1250.0,
+        "relative": 1.404494382022472
+      }
+    },
+    {
+      "name": "compute/spectral_norm",
+      "category": "compute",
+      "lua": {
+        "wall_ms": 860.0,
+        "relative": 1.0
+      },
+      "lua55": {
+        "wall_ms": 860.0,
+        "relative": 1.0
+      },
+      "luajit": {
+        "wall_ms": 30.0,
+        "relative": 0.03488372093023256
+      },
+      "luau": {
+        "wall_ms": 1220.0,
+        "relative": 1.4186046511627908
+      },
+      "luau-codegen": {
+        "wall_ms": 780.0,
+        "relative": 0.9069767441860465
+      },
+      "quickjs": {
+        "wall_ms": 1640.0,
+        "relative": 1.9069767441860466
+      },
+      "v8": {
+        "wall_ms": 110.0,
+        "relative": 0.12790697674418605
+      },
+      "v8-nojit": {
+        "wall_ms": 1800.0,
+        "relative": 2.0930232558139537
+      }
+    },
+    {
+      "name": "coroutine/scheduler",
+      "category": "coroutine",
+      "lua": {
+        "wall_ms": 450.0,
+        "relative": 1.0
+      },
+      "lua55": {
+        "wall_ms": 460.0,
+        "relative": 1.0222222222222221
+      },
+      "luajit": {
+        "wall_ms": 220.0,
+        "relative": 0.4888888888888889
+      },
+      "luau": {
+        "wall_ms": 230.0,
+        "relative": 0.5111111111111111
+      },
+      "luau-codegen": {
+        "wall_ms": 190.0,
+        "relative": 0.4222222222222222
+      },
+      "quickjs": {
+        "wall_ms": 510.0,
+        "relative": 1.1333333333333333
+      },
+      "v8": {
+        "wall_ms": 70.0,
+        "relative": 0.15555555555555556
+      },
+      "v8-nojit": {
+        "wall_ms": 350.0,
+        "relative": 0.7777777777777778
+      }
+    },
+    {
+      "name": "string/fasta",
+      "category": "string",
+      "lua": {
+        "wall_ms": 470.0,
+        "relative": 1.0
+      },
+      "lua55": {
+        "wall_ms": 460.0,
+        "relative": 0.9787234042553191
+      },
+      "luajit": {
+        "wall_ms": 150.0,
+        "relative": 0.3191489361702128
+      },
+      "luau": {
+        "wall_ms": 470.0,
+        "relative": 1.0
+      },
+      "luau-codegen": {
+        "wall_ms": 310.0,
+        "relative": 0.6595744680851063
+      },
+      "quickjs": {
+        "wall_ms": 680.0,
+        "relative": 1.446808510638298
+      },
+      "v8": {
+        "wall_ms": 100.0,
+        "relative": 0.2127659574468085
+      },
+      "v8-nojit": {
+        "wall_ms": 640.0,
+        "relative": 1.3617021276595744
+      }
+    },
+    {
+      "name": "string/json_parse",
+      "category": "string",
+      "lua": {
+        "wall_ms": 500.0,
+        "relative": 1.0
+      },
+      "lua55": {
+        "wall_ms": 520.0,
+        "relative": 1.04
+      },
+      "luajit": {
+        "wall_ms": 240.0,
+        "relative": 0.48
+      },
+      "luau": {
+        "wall_ms": 490.0,
+        "relative": 0.98
+      },
+      "luau-codegen": {
+        "wall_ms": 450.0,
+        "relative": 0.9
+      },
+      "quickjs": {
+        "wall_ms": 430.0,
+        "relative": 0.86
+      },
+      "v8": {
+        "wall_ms": 80.0,
+        "relative": 0.16
+      },
+      "v8-nojit": {
+        "wall_ms": 350.0,
+        "relative": 0.7
+      }
+    },
+    {
+      "name": "string/string_concat",
+      "category": "string",
+      "lua": {
+        "wall_ms": 180.0,
+        "relative": 1.0
+      },
+      "lua55": {
+        "wall_ms": 150.0,
+        "relative": 0.8333333333333334
+      },
+      "luajit": {
+        "wall_ms": 70.0,
+        "relative": 0.3888888888888889
+      },
+      "luau": {
+        "wall_ms": 140.0,
+        "relative": 0.7777777777777778
+      },
+      "luau-codegen": {
+        "wall_ms": 120.0,
+        "relative": 0.6666666666666666
+      },
+      "quickjs": {
+        "wall_ms": 270.0,
+        "relative": 1.5
+      },
+      "v8": {
+        "wall_ms": 90.0,
+        "relative": 0.5
+      },
+      "v8-nojit": {
+        "wall_ms": 190.0,
+        "relative": 1.0555555555555556
+      }
+    },
+    {
+      "name": "table/array_access",
+      "category": "table",
+      "lua": {
+        "wall_ms": 720.0,
+        "relative": 1.0
+      },
+      "lua55": {
+        "wall_ms": 560.0,
+        "relative": 0.7777777777777778
+      },
+      "luajit": {
+        "wall_ms": 230.0,
+        "relative": 0.3194444444444444
+      },
+      "luau": {
+        "wall_ms": 680.0,
+        "relative": 0.9444444444444444
+      },
+      "luau-codegen": {
+        "wall_ms": 470.0,
+        "relative": 0.6527777777777778
+      },
+      "quickjs": {
+        "wall_ms": 1710.0,
+        "relative": 2.375
+      },
+      "v8": {
+        "wall_ms": 120.0,
+        "relative": 0.16666666666666666
+      },
+      "v8-nojit": {
+        "wall_ms": 1250.0,
+        "relative": 1.7361111111111112
+      }
+    },
+    {
+      "name": "table/table_insert",
+      "category": "table",
+      "lua": {
+        "wall_ms": 920.0,
+        "relative": 1.0
+      },
+      "lua55": {
+        "wall_ms": 890.0,
+        "relative": 0.967391304347826
+      },
+      "luajit": {
+        "wall_ms": 390.0,
+        "relative": 0.42391304347826086
+      },
+      "luau": {
+        "wall_ms": 760.0,
+        "relative": 0.8260869565217391
+      },
+      "luau-codegen": {
+        "wall_ms": 760.0,
+        "relative": 0.8260869565217391
+      },
+      "quickjs": {
+        "wall_ms": 370.0,
+        "relative": 0.40217391304347827
+      },
+      "v8": {
+        "wall_ms": 360.0,
+        "relative": 0.391304347826087
+      },
+      "v8-nojit": {
+        "wall_ms": 390.0,
+        "relative": 0.42391304347826086
+      }
+    },
+    {
+      "name": "table/table_ops",
+      "category": "table",
+      "lua": {
+        "wall_ms": 1340.0,
+        "relative": 1.0
+      },
+      "lua55": {
+        "wall_ms": 1260.0,
+        "relative": 0.9402985074626866
+      },
+      "luajit": {
+        "wall_ms": 530.0,
+        "relative": 0.39552238805970147
+      },
+      "luau": {
+        "wall_ms": 1220.0,
+        "relative": 0.9104477611940298
+      },
+      "luau-codegen": {
+        "wall_ms": 990.0,
+        "relative": 0.7388059701492538
+      },
+      "quickjs": {
+        "wall_ms": 880.0,
+        "relative": 0.6567164179104478
+      },
+      "v8": {
+        "wall_ms": 320.0,
+        "relative": 0.23880597014925373
+      },
+      "v8-nojit": {
+        "wall_ms": 410.0,
+        "relative": 0.30597014925373134
+      }
+    }
+  ],
+  "memory": [
+    {
+      "name": "alloc/binary_trees",
+      "lua": 21280,
+      "lua55": 33600,
+      "luajit": 29120,
+      "luau": 34944,
+      "luau-codegen": 35572,
+      "quickjs": 19360,
+      "v8": 48960,
+      "v8-nojit": 40320
+    },
+    {
+      "name": "alloc/gc_stress",
+      "lua": 370400,
+      "lua55": 385280,
+      "luajit": 252960,
+      "luau": 318080,
+      "luau-codegen": 311840,
+      "quickjs": 225120,
+      "v8": 104320,
+      "v8-nojit": 120160
+    },
+    {
+      "name": "alloc/object_churn",
+      "lua": 2240,
+      "lua55": 2240,
+      "luajit": 2400,
+      "luau": 5440,
+      "luau-codegen": 6080,
+      "quickjs": 3040,
+      "v8": 27680,
+      "v8-nojit": 20160
+    },
+    {
+      "name": "call/ackermann",
+      "lua": 3360,
+      "lua55": 3520,
+      "luajit": 2880,
+      "luau": 6080,
+      "luau-codegen": 6880,
+      "quickjs": 8800,
+      "v8": 25760,
+      "v8-nojit": 18560
+    },
+    {
+      "name": "call/closure",
+      "lua": 2080,
+      "lua55": 2240,
+      "luajit": 2560,
+      "luau": 5280,
+      "luau-codegen": 5920,
+      "quickjs": 3040,
+      "v8": 29120,
+      "v8-nojit": 20160
+    },
+    {
+      "name": "call/fibonacci",
+      "lua": 2240,
+      "lua55": 2240,
+      "luajit": 2400,
+      "luau": 5120,
+      "luau-codegen": 5920,
+      "quickjs": 3040,
+      "v8": 24960,
+      "v8-nojit": 17600
+    },
+    {
+      "name": "call/method_dispatch",
+      "lua": 2080,
+      "lua55": 2240,
+      "luajit": 2400,
+      "luau": 5280,
+      "luau-codegen": 6080,
+      "quickjs": 3040,
+      "v8": 28800,
+      "v8-nojit": 20320
+    },
+    {
+      "name": "call/queens",
+      "lua": 2080,
+      "lua55": 2240,
+      "luajit": 2400,
+      "luau": 5280,
+      "luau-codegen": 6080,
+      "quickjs": 3040,
+      "v8": 25760,
+      "v8-nojit": 17920
+    },
+    {
+      "name": "call/tak",
+      "lua": 2240,
+      "lua55": 2240,
+      "luajit": 2400,
+      "luau": 5120,
+      "luau-codegen": 5920,
+      "quickjs": 3040,
+      "v8": 24960,
+      "v8-nojit": 17600
+    },
+    {
+      "name": "compute/fannkuch",
+      "lua": 2240,
+      "lua55": 2400,
+      "luajit": 2400,
+      "luau": 5280,
+      "luau-codegen": 6080,
+      "quickjs": 3040,
+      "v8": 26080,
+      "v8-nojit": 17920
+    },
+    {
+      "name": "compute/mandelbrot",
+      "lua": 2400,
+      "lua55": 2240,
+      "luajit": 2560,
+      "luau": 5120,
+      "luau-codegen": 5920,
+      "quickjs": 3040,
+      "v8": 27040,
+      "v8-nojit": 20480
+    },
+    {
+      "name": "compute/matrix",
+      "lua": 6400,
+      "lua55": 4640,
+      "luajit": 4320,
+      "luau": 9440,
+      "luau-codegen": 10080,
+      "quickjs": 6560,
+      "v8": 29440,
+      "v8-nojit": 23360
+    },
+    {
+      "name": "compute/nbody",
+      "lua": 2400,
+      "lua55": 2400,
+      "luajit": 2560,
+      "luau": 5440,
+      "luau-codegen": 6400,
+      "quickjs": 3040,
+      "v8": 28160,
+      "v8-nojit": 20320
+    },
+    {
+      "name": "compute/sieve",
+      "lua": 34780,
+      "lua55": 38044,
+      "luajit": 166080,
+      "luau": 332800,
+      "luau-codegen": 333600,
+      "quickjs": 104604,
+      "v8": 89440,
+      "v8-nojit": 87840
+    },
+    {
+      "name": "compute/spectral_norm",
+      "lua": 2400,
+      "lua55": 2400,
+      "luajit": 2400,
+      "luau": 5440,
+      "luau-codegen": 6080,
+      "quickjs": 3040,
+      "v8": 27840,
+      "v8-nojit": 20480
+    },
+    {
+      "name": "coroutine/scheduler",
+      "lua": 2240,
+      "lua55": 2240,
+      "luajit": 2400,
+      "luau": 5280,
+      "luau-codegen": 5920,
+      "quickjs": 3040,
+      "v8": 28000,
+      "v8-nojit": 20320
+    },
+    {
+      "name": "string/fasta",
+      "lua": 2400,
+      "lua55": 2400,
+      "luajit": 2560,
+      "luau": 5280,
+      "luau-codegen": 5920,
+      "quickjs": 3040,
+      "v8": 28960,
+      "v8-nojit": 20160
+    },
+    {
+      "name": "string/json_parse",
+      "lua": 48520,
+      "lua55": 48656,
+      "luajit": 51904,
+      "luau": 54212,
+      "luau-codegen": 54920,
+      "quickjs": 35200,
+      "v8": 85884,
+      "v8-nojit": 76320
+    },
+    {
+      "name": "string/string_concat",
+      "lua": 142720,
+      "lua55": 75680,
+      "luajit": 77600,
+      "luau": 156960,
+      "luau-codegen": 157600,
+      "quickjs": 85920,
+      "v8": 107768,
+      "v8-nojit": 100476
+    },
+    {
+      "name": "table/array_access",
+      "lua": 526400,
+      "lua55": 296896,
+      "luajit": 264480,
+      "luau": 529280,
+      "luau-codegen": 530080,
+      "quickjs": 315360,
+      "v8": 104000,
+      "v8-nojit": 96000
+    },
+    {
+      "name": "table/table_insert",
+      "lua": 112188,
+      "lua55": 112184,
+      "luajit": 81860,
+      "luau": 106748,
+      "luau-codegen": 107112,
+      "quickjs": 109600,
+      "v8": 96748,
+      "v8-nojit": 88984
+    },
+    {
+      "name": "table/table_ops",
+      "lua": 222252,
+      "lua55": 215620,
+      "luajit": 184308,
+      "luau": 215208,
+      "luau-codegen": 215860,
+      "quickjs": 187840,
+      "v8": 118420,
+      "v8-nojit": 143976
+    }
+  ]
+};
+
+const COLORS = {
+  'lua':       { bg: 'rgba(59,130,246,0.7)',  border: '#3b82f6'  },
+  'luajit':    { bg: 'rgba(16,185,129,0.7)',  border: '#10b981'  },
+  'quickjs':   { bg: 'rgba(245,158,11,0.7)',  border: '#f59e0b'  },
+  'v8':        { bg: 'rgba(239,68,68,0.7)',   border: '#ef4444'  },
+  'v8-nojit':  { bg: 'rgba(168,85,247,0.7)',  border: '#a855f7'  },
+};
+
+const CAT_COLORS = [
+  'rgba(59,130,246,0.8)',
+  'rgba(16,185,129,0.8)',
+  'rgba(245,158,11,0.8)',
+  'rgba(239,68,68,0.8)',
+  'rgba(168,85,247,0.8)',
+  'rgba(236,72,153,0.8)',
+  'rgba(107,114,128,0.8)',
+];
+
+function getColor(engine) {
+  return COLORS[engine] || { bg: 'rgba(107,114,128,0.7)', border: '#6b7280' };
+}
+
+// Overall stacked bar chart
+function renderOverall() {
+  const overall = DATA.overall;
+  const labels = overall.map(o => o.engine);
+  const categories = DATA.categories;
+
+  const datasets = categories.map((cat, i) => ({
+    label: cat,
+    data: overall.map(o => (o.category_breakdown[cat] || 0)),
+    backgroundColor: CAT_COLORS[i % CAT_COLORS.length],
+  }));
+
+  new Chart(document.getElementById('overallChart'), {
+    type: 'bar',
+    data: { labels, datasets },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        x: { stacked: true },
+        y: { stacked: true, title: { display: true, text: 'Total Time (ms)' } },
+      },
+      plugins: {
+        title: { display: true, text: 'Overall Performance (stacked by category) — lower is better' },
+        tooltip: {
+          callbacks: {
+            afterBody: function(items) {
+              const idx = items[0].dataIndex;
+              const o = overall[idx];
+              return `\nTotal: ${o.total_ms.toFixed(0)} ms (${o.relative.toFixed(2)}x vs ${DATA.baseline})`;
+            }
+          }
+        }
+      }
+    }
+  });
+
+  // Overall table
+  const table = document.getElementById('overallTable');
+  let html = '<tr><th>Rank</th><th>Engine</th><th>Total Time (ms)</th><th>vs ' + DATA.baseline + '</th></tr>';
+  overall.forEach((o, i) => {
+    const cls = o.engine === DATA.baseline ? 'baseline' : (o.relative < 1 ? 'faster' : 'slower');
+    html += `<tr><td class="rank">#${i+1}</td><td>${o.engine}</td><td>${o.total_ms.toFixed(0)}</td><td class="${cls}">${o.relative.toFixed(2)}x</td></tr>`;
+  });
+  table.innerHTML = html;
+}
+
+// Category grouped bar chart
+function renderCategory() {
+  const categories = Object.keys(DATA.category_summary);
+  const engines = DATA.engines;
+
+  const datasets = engines.map(engine => ({
+    label: engine,
+    data: categories.map(cat => DATA.category_summary[cat][engine] || 0),
+    backgroundColor: getColor(engine).bg,
+    borderColor: getColor(engine).border,
+    borderWidth: 1,
+  }));
+
+  new Chart(document.getElementById('categoryChart'), {
+    type: 'bar',
+    data: { labels: categories, datasets },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        y: { title: { display: true, text: 'Relative to ' + DATA.baseline + ' (1.0x)' } },
+      },
+      plugins: {
+        title: { display: true, text: 'Performance by Category (relative to ' + DATA.baseline + ')' },
+        annotation: {
+          annotations: {
+            baseline: { type: 'line', yMin: 1, yMax: 1, borderColor: '#333', borderDash: [5,5] }
+          }
+        }
+      }
+    }
+  });
+}
+
+// Detail chart
+function renderDetail() {
+  const benchmarks = DATA.benchmarks;
+  const labels = benchmarks.map(b => b.name);
+  const engines = DATA.engines;
+
+  const datasets = engines.map(engine => ({
+    label: engine,
+    data: benchmarks.map(b => b[engine] ? b[engine].wall_ms : 0),
+    backgroundColor: getColor(engine).bg,
+    borderColor: getColor(engine).border,
+    borderWidth: 1,
+  }));
+
+  new Chart(document.getElementById('detailChart'), {
+    type: 'bar',
+    data: { labels, datasets },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      indexAxis: 'y',
+      scales: {
+        x: { title: { display: true, text: 'Time (ms)' } },
+      },
+      plugins: {
+        title: { display: true, text: 'All Benchmarks — Absolute Time (ms)' },
+      }
+    }
+  });
+
+  // Detail table
+  const table = document.getElementById('detailTable');
+  let html = '<tr><th>Benchmark</th><th>Category</th><th>' + DATA.baseline + ' (ms)</th>';
+  engines.filter(e => e !== DATA.baseline).forEach(e => { html += `<th>${e}</th>`; });
+  html += '</tr>';
+
+  benchmarks.forEach(b => {
+    const base = b[DATA.baseline];
+    html += `<tr><td>${b.name}</td><td>${b.category}</td>`;
+    html += `<td>${base ? base.wall_ms.toFixed(0) : '-'}</td>`;
+    engines.filter(e => e !== DATA.baseline).forEach(e => {
+      const d = b[e];
+      if (d) {
+        const cls = d.relative < 1 ? 'faster' : (d.relative > 1 ? 'slower' : '');
+        html += `<td class="${cls}">${d.relative.toFixed(2)}x</td>`;
+      } else {
+        html += '<td>-</td>';
+      }
+    });
+    html += '</tr>';
+  });
+  table.innerHTML = html;
+}
+
+// Radar chart
+function renderRadar() {
+  const categories = Object.keys(DATA.category_summary);
+  const engines = DATA.engines;
+
+  const datasets = engines.map(engine => {
+    const color = getColor(engine);
+    return {
+      label: engine,
+      data: categories.map(cat => {
+        const val = DATA.category_summary[cat][engine] || 1;
+        return 1 / val;
+      }),
+      backgroundColor: color.bg.replace('0.7', '0.2'),
+      borderColor: color.border,
+      borderWidth: 2,
+      pointRadius: 4,
+    };
+  });
+
+  new Chart(document.getElementById('radarChart'), {
+    type: 'radar',
+    data: { labels: categories, datasets },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        r: {
+          beginAtZero: true,
+          ticks: { display: false },
+        }
+      },
+      plugins: {
+        title: { display: true, text: 'Engine Strengths (higher = faster, 1/relative)' },
+        tooltip: {
+          callbacks: {
+            label: function(ctx) {
+              const cat = categories[ctx.dataIndex];
+              const engine = ctx.dataset.label;
+              const rel = DATA.category_summary[cat][engine] || 0;
+              return `${engine}: ${rel.toFixed(2)}x vs ${DATA.baseline}`;
+            }
+          }
+        }
+      }
+    }
+  });
+}
+
+// Memory chart
+function renderMemory() {
+  const mem = DATA.memory;
+  const labels = mem.map(m => m.name);
+  const engines = DATA.engines;
+
+  const datasets = engines.map(engine => ({
+    label: engine,
+    data: mem.map(m => m[engine] || 0),
+    backgroundColor: getColor(engine).bg,
+    borderColor: getColor(engine).border,
+    borderWidth: 1,
+  }));
+
+  new Chart(document.getElementById('memoryChart'), {
+    type: 'bar',
+    data: { labels, datasets },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      indexAxis: 'y',
+      scales: {
+        x: { title: { display: true, text: 'Peak RSS (KB)' } },
+      },
+      plugins: {
+        title: { display: true, text: 'Memory Usage — Peak Resident Set Size (KB)' },
+      }
+    }
+  });
+}
+
+function renderEnvironment() {
+  const info = DATA.system_info;
+  if (!info || !info.system) return;
+
+  document.getElementById('envSection').style.display = 'block';
+
+  const sys = info.system;
+  const table = document.getElementById('envTable');
+  let html = '<tr><th style="width:150px">Item</th><th>Value</th></tr>';
+  html += `<tr><td>Date</td><td>${sys.date || '-'}</td></tr>`;
+  html += `<tr><td>OS</td><td>${sys.os || '-'} ${sys.kernel || ''}</td></tr>`;
+  html += `<tr><td>Architecture</td><td>${sys.arch || '-'}</td></tr>`;
+  html += `<tr><td>CPU</td><td>${sys.cpu || '-'}</td></tr>`;
+  html += `<tr><td>CPU Cores</td><td>${sys.cpu_cores || '-'}</td></tr>`;
+  html += `<tr><td>Memory</td><td>${sys.memory || '-'}</td></tr>`;
+  const cfg = info.config;
+  if (cfg) {
+    html += `<tr><td>Runs</td><td>${cfg.runs}</td></tr>`;
+    html += `<tr><td>Warmup</td><td>${cfg.warmup}</td></tr>`;
+  }
+  table.innerHTML = html;
+
+  const engines = info.engines;
+  if (engines) {
+    const etable = document.getElementById('enginesTable');
+    let ehtml = '<tr><th>Engine</th><th>Name</th><th>Version</th></tr>';
+    for (const [eid, edata] of Object.entries(engines)) {
+      ehtml += `<tr><td>${eid}</td><td>${edata.display_name || eid}</td><td>${edata.version || '-'}</td></tr>`;
+    }
+    etable.innerHTML = ehtml;
+  }
+}
+
+renderEnvironment();
+renderOverall();
+renderCategory();
+renderDetail();
+renderRadar();
+renderMemory();
+</script>
+</body>
+</html>

@@ -1,0 +1,59 @@
+{
+  "system": {
+    "date": "2026-06-11 08:59:42 UTC",
+    "os": "Linux",
+    "kernel": "6.6.87.2-microsoft-standard-WSL2",
+    "arch": "x86_64",
+    "cpu": "Intel(R) Core(TM) Ultra 7 255HX",
+    "cpu_cores": 20,
+    "memory": "15Gi",
+    "compiler": "cc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0"
+  },
+  "engines": {
+    "lua": {
+      "display_name": "Lua 5.4",
+      "version": "Lua 5.4.7  Copyright (C) 1994-2024 Lua.org, PUC-Rio",
+      "build_flags": "-O2"
+    },
+    "lua55": {
+      "display_name": "Lua 5.5",
+      "version": "Lua 5.5.0  Copyright (C) 1994-2025 Lua.org, PUC-Rio",
+      "build_flags": "-O2"
+    },
+    "luajit": {
+      "display_name": "LuaJIT 2.1",
+      "version": "LuaJIT 2.1.1780076327 -- Copyright (C) 2005-2026 Mike Pall. https://luajit.org/",
+      "build_flags": "-O2 -fomit-frame-pointer"
+    },
+    "luau": {
+      "display_name": "Luau",
+      "version": "Luau",
+      "build_flags": "-O2 (Release)"
+    },
+    "luau-codegen": {
+      "display_name": "Luau (codegen)",
+      "version": "Luau",
+      "build_flags": "-O2 (Release, native codegen)"
+    },
+    "quickjs": {
+      "display_name": "QuickJS",
+      "version": "QuickJS version 2026-06-04",
+      "build_flags": "-O2"
+    },
+    "v8": {
+      "display_name": "V8 (JIT)",
+      "version": "V8 version 15.1.0 (candidate)",
+      "build_flags": "-O2 (release)"
+    },
+    "v8-nojit": {
+      "display_name": "V8 (no-JIT)",
+      "version": "V8 version 15.1.0 (candidate)",
+      "build_flags": "-O2 (release)"
+    }
+  },
+  "config": {
+    "runs": 5,
+    "warmup": 2,
+    "category": "all"
+  }
+}
